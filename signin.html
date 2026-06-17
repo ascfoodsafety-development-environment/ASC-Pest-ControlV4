@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en-ZA">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0c1318" />
+  <title>Sign In — ASC Pest Control Hub</title>
+  <meta name="description" content="Sign in to the ASC Pest Control Hub — one secure login for clients, teams and technicians." />
+  <meta name="robots" content="noindex, follow" />
+  <link rel="icon" type="image/png" href="logo.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    :root{
+      --navy:#16202c; --orange:#B02040; --orange-soft:rgba(176,32,64,.12); --olive:#6B8E23; --olive-soft:rgba(107,142,35,.14);
+      --green:#36c172; --green-soft:rgba(54,193,114,.14);
+      --text:#1f2a36; --muted:#6b7785; --line:#e4e8ec;
+    }
+    *{box-sizing:border-box;}
+    body{margin:0;font-family:"Inter",system-ui,sans-serif;color:var(--text);}
+    a{text-decoration:none;}
+    @keyframes fu{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+
+    .auth{position:fixed;inset:0;z-index:100;background:radial-gradient(1200px 600px at 70% -10%,#22303c,#0c1318 60%);display:grid;place-items:center;padding:24px;overflow:auto}
+    .auth::before{content:"";position:absolute;inset:0;background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,.05) 1px,transparent 0);background-size:22px 22px;pointer-events:none}
+    .authcard{width:430px;max-width:100%;background:#fff;border-radius:22px;box-shadow:0 30px 80px rgba(0,0,0,.4);padding:34px 32px;position:relative;z-index:1;animation:fu .45s ease both}
+    .authlogo{display:flex;align-items:center;gap:11px;justify-content:center}
+    .authlogo img{width:42px;height:42px;border-radius:11px}
+    .authlogo span{font-family:'Sora';font-weight:700;font-size:17px;color:var(--navy)}
+    .authtitle{text-align:center;font-family:'Sora';font-weight:700;font-size:22px;margin-top:18px;letter-spacing:-.01em}
+    .authsub{text-align:center;color:var(--muted);font-size:13.5px;margin-top:6px;margin-bottom:24px;line-height:1.5}
+    .field{margin-bottom:14px}
+    .field label{display:block;font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:6px;font-family:'Sora'}
+    .field input{width:100%;border:1.5px solid var(--line);border-radius:11px;padding:12px 13px;font-family:inherit;font-size:14px;outline:none;transition:.15s;background:#fff;color:var(--text)}
+    .field input:focus{border-color:var(--orange);box-shadow:0 0 0 3px var(--orange-soft)}
+    .authbtn{width:100%;background:var(--orange);color:#fff;border:none;border-radius:11px;padding:13px;font-family:'Sora';font-weight:600;font-size:14.5px;cursor:pointer;margin-top:6px;transition:.15s}
+    .authbtn:hover{filter:brightness(1.06);transform:translateY(-1px)}
+    .authbtn:disabled{opacity:.65;cursor:default;transform:none;filter:none}
+    .authbtn.dark{background:var(--navy)}
+    .authbtn.ghost{background:#fff;color:var(--olive);border:1.5px solid var(--olive)}
+    .authbtn.ghost:hover{background:var(--olive);color:#fff;border-color:var(--olive);filter:none}
+    .or-divider{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin:16px 0 6px}
+    .or-divider::before,.or-divider::after{content:"";flex:1;height:1px;background:var(--line)}
+    .authrow{display:flex;justify-content:space-between;align-items:center;margin:-4px 0 14px;font-size:12.5px;color:var(--muted)}
+    .authrow a,.authalt a{color:var(--orange);font-weight:600;cursor:pointer;text-decoration:none;font-size:12.5px}
+    .authcheck{display:flex;gap:8px;align-items:center;font-size:12.5px;color:var(--muted);cursor:pointer}
+    .authcheck input{accent-color:var(--orange)}
+    .authalt{text-align:center;font-size:13px;color:var(--muted);margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}
+    .otpboxes{display:flex;gap:9px;justify-content:center;margin:4px 0 20px}
+    .otpboxes input{width:46px;height:56px;text-align:center;font-family:'Sora';font-weight:700;font-size:22px;color:var(--navy);border:1.5px solid var(--line);border-radius:12px;outline:none;transition:.15s}
+    .otpboxes input:focus{border-color:var(--orange);box-shadow:0 0 0 3px var(--orange-soft)}
+    .authstep{display:none}.authstep.on{display:block;animation:fu .3s ease both}
+    .otptarget{color:var(--text);font-weight:700}
+    .alert{font-size:12.5px;padding:10px 12px;border-radius:10px;margin-bottom:14px;line-height:1.45}
+    .alert.err{color:#b42318;background:#fef0ee;border:1px solid #f7c6bf}
+    .alert.dev{color:#8a6d00;background:#fff7da;border:1px solid #ffe08a}
+    .authback{position:absolute;top:18px;left:20px;font-size:12.5px;color:#cdd5dd;font-family:'Sora';font-weight:600;z-index:2}
+    .authback:hover{color:#fff}
+  </style>
+</head>
+<body>
+  <a class="authback" href="index.html">&larr; Back to site</a>
+
+  <div class="auth">
+    <div class="authcard">
+      <div class="authlogo"><img src="logo.png" alt="ASC" /><span>ASC Pest Control Hub</span></div>
+
+      <!-- STEP 1: password sign-in (primary) + one-time code (secondary) -->
+      <div class="authstep on" id="step-login">
+        <div class="authtitle">Welcome back</div>
+        <div class="authsub">Sign in with your password — or request a one-time code instead.</div>
+
+        <div class="field">
+          <label for="authIdentifier">Email or phone number</label>
+          <input id="authIdentifier" type="text" inputmode="email" autocomplete="username" placeholder="you@example.co.za or 082 000 0000" />
+        </div>
+        <div class="field">
+          <label for="authPassword">Password</label>
+          <input id="authPassword" type="password" autocomplete="current-password" placeholder="Your password" />
+        </div>
+
+        <div class="authrow">
+          <label class="authcheck"><input id="authRemember" type="checkbox" /> Remember this device</label>
+          <a href="index.html#contact">Forgot password?</a>
+        </div>
+
+        <div class="alert err" id="idError" style="display:none"></div>
+
+        <button class="authbtn" id="signinBtn" type="button">Sign in</button>
+
+        <div class="or-divider">or</div>
+        <button class="authbtn ghost" id="otpMethodBtn" type="button">Send a one-time code</button>
+
+        <div class="authalt">New customer? <a href="index.html#contact">Request portal access</a></div>
+      </div>
+
+      <!-- STEP 2: OTP -->
+      <div class="authstep" id="step-otp">
+        <div class="authtitle">Verify it&#39;s you</div>
+        <div class="authsub">We sent a 6-digit code to <span class="otptarget" id="otpTarget"></span>. Enter it below to continue.</div>
+
+        <div class="otpboxes" id="otpBoxes">
+          <input maxlength="1" inputmode="numeric" autocomplete="one-time-code" />
+          <input maxlength="1" inputmode="numeric" />
+          <input maxlength="1" inputmode="numeric" />
+          <input maxlength="1" inputmode="numeric" />
+          <input maxlength="1" inputmode="numeric" />
+          <input maxlength="1" inputmode="numeric" />
+        </div>
+
+        <div class="alert dev" id="devHint" style="display:none"></div>
+        <div class="alert err" id="otpError" style="display:none"></div>
+
+        <button class="authbtn" id="verifyOtpBtn" type="button">Verify &amp; continue</button>
+        <button class="authbtn ghost" id="backToIdBtn" type="button">Back to sign in</button>
+        <div class="authalt">Didn&#39;t get a code? <a id="resendBtn">Resend code</a></div>
+      </div>
+
+      <!-- STEP 3: create a new password (first login / forced reset) -->
+      <div class="authstep" id="step-newpw">
+        <div class="authtitle">Create your password</div>
+        <div class="authsub">For your security, please replace the temporary password we emailed you with one of your own.</div>
+
+        <div class="field">
+          <label for="newPassword">New password</label>
+          <input id="newPassword" type="password" autocomplete="new-password" placeholder="At least 8 characters" />
+        </div>
+        <div class="field">
+          <label for="newPassword2">Confirm new password</label>
+          <input id="newPassword2" type="password" autocomplete="new-password" placeholder="Re-enter your password" />
+        </div>
+
+        <div class="alert err" id="pwError" style="display:none"></div>
+        <button class="authbtn" id="setPwBtn" type="button">Set password &amp; continue</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    var API = (location.protocol === 'file:' || location.port === '5500' || location.port === '8080')
+      ? 'http://127.0.0.1:8000'
+      : location.origin;
+
+    var identifier = '';
+    var ROLE_REDIRECT = {
+      admin:          'internal_operations.html',
+      branch_manager: 'internal_operations.html',
+      technician:     'hub/',
+      sales_agent:    'hub/',
+      customer:       'org-portal.html'
+    };
+
+    var $ = function (id) { return document.getElementById(id); };
+    function show(id, msg) { var e = $(id); e.textContent = msg; e.style.display = 'block'; }
+    function hide(id) { var e = $(id); e.textContent = ''; e.style.display = 'none'; }
+    function step(id) {
+      document.querySelectorAll('.authstep').forEach(function (s) { s.classList.remove('on'); });
+      $(id).classList.add('on');
+    }
+
+    var currentToken = '', currentRole = '';
+
+    /* shared: persist token + redirect by role (or force a password reset first) */
+    function signedIn(d) {
+      var store = $('authRemember').checked ? localStorage : sessionStorage;
+      store.setItem('asc_token', d.access_token);
+      store.setItem('asc_role', d.role);
+      store.setItem('asc_user_id', d.user_id || '');
+      store.setItem('asc_branch_id', d.branch_id || '');
+
+      if (d.must_change_password) {
+        currentToken = d.access_token; currentRole = d.role;
+        hide('pwError'); step('step-newpw');
+        setTimeout(function () { $('newPassword').focus(); }, 120);
+        return;
+      }
+      redirectFor(d.role);
+    }
+    function redirectFor(role) {
+      var dest = ROLE_REDIRECT[role] || 'hub/';
+      var pending = sessionStorage.getItem('asc_redirect');
+      if (pending) { sessionStorage.removeItem('asc_redirect'); dest = pending; }
+      location.href = dest;
+    }
+
+    /* ---------- OTP boxes ---------- */
+    var boxes = Array.prototype.slice.call($('otpBoxes').querySelectorAll('input'));
+    boxes.forEach(function (box, i) {
+      box.addEventListener('input', function () {
+        box.value = box.value.replace(/\D/g, '').slice(0, 1);
+        if (box.value && i < boxes.length - 1) boxes[i + 1].focus();
+        if (otpCode().length === 6) $('verifyOtpBtn').focus();
+      });
+      box.addEventListener('keydown', function (e) {
+        if (e.key === 'Backspace' && !box.value && i > 0) boxes[i - 1].focus();
+        if (e.key === 'Enter') verify();
+      });
+      box.addEventListener('paste', function (e) {
+        var t = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
+        if (!t) return; e.preventDefault();
+        t.split('').forEach(function (d, k) { if (boxes[k]) boxes[k].value = d; });
+        (boxes[Math.min(t.length, 5)]).focus();
+      });
+    });
+    function otpCode() { return boxes.map(function (b) { return b.value; }).join(''); }
+    function clearOtp() { boxes.forEach(function (b) { b.value = ''; }); }
+
+    /* ---------- Method A: password sign-in ---------- */
+    function passwordLogin() {
+      hide('idError');
+      identifier = $('authIdentifier').value.trim();
+      var password = $('authPassword').value;
+      if (!identifier) { show('idError', 'Please enter your email or phone number.'); return; }
+      if (!password) { show('idError', 'Enter your password, or use a one-time code instead.'); return; }
+
+      var btn = $('signinBtn'); btn.textContent = 'Signing in…'; btn.disabled = true;
+      fetch(API + '/v1/auth/login', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier: identifier, password: password })
+      })
+      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, status: r.status, data: d }; }).catch(function () { return { ok: r.ok, status: r.status, data: {} }; }); })
+      .then(function (res) {
+        if (res.ok) { btn.textContent = 'Success — redirecting…'; signedIn(res.data); return; }
+        btn.textContent = 'Sign in'; btn.disabled = false;
+        if (res.status === 404 || res.status === 405 || res.status === 501) show('idError', 'Password sign-in isn’t enabled yet — please use a one-time code below.');
+        else if (res.status === 401) show('idError', 'Incorrect email/phone or password.');
+        else show('idError', (res.data && res.data.detail) || 'Sign in failed. Please try again.');
+      })
+      .catch(function () { btn.textContent = 'Sign in'; btn.disabled = false; show('idError', 'Network error. Is the API running?'); });
+    }
+
+    /* ---------- Method B: request one-time code ---------- */
+    function requestOtp() {
+      hide('idError');
+      identifier = $('authIdentifier').value.trim();
+      if (!identifier) { show('idError', 'Please enter your email or phone number.'); return; }
+
+      var btn = $('otpMethodBtn'); btn.textContent = 'Sending…'; btn.disabled = true;
+      fetch(API + '/v1/auth/otp/request', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier: identifier })
+      })
+      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
+      .then(function (res) {
+        btn.textContent = 'Send a one-time code'; btn.disabled = false;
+        if (!res.ok) { show('idError', (res.data && res.data.detail) || 'Could not send code. Please try again.'); return; }
+        $('otpTarget').textContent = identifier;
+        hide('devHint'); hide('otpError'); clearOtp();
+        if (res.data && res.data.dev_code) show('devHint', 'Dev mode — your code is ' + res.data.dev_code);
+        step('step-otp');
+        setTimeout(function () { boxes[0].focus(); }, 120);
+      })
+      .catch(function () { btn.textContent = 'Send a one-time code'; btn.disabled = false; show('idError', 'Network error. Is the API running?'); });
+    }
+
+    /* ---------- verify OTP ---------- */
+    function verify() {
+      hide('otpError');
+      var code = otpCode();
+      if (code.length !== 6) { show('otpError', 'Enter the 6-digit code.'); return; }
+      var btn = $('verifyOtpBtn'); btn.textContent = 'Verifying…'; btn.disabled = true;
+      fetch(API + '/v1/auth/otp/verify', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier: identifier, code: code })
+      })
+      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
+      .then(function (res) {
+        if (!res.ok) {
+          btn.textContent = 'Verify & continue'; btn.disabled = false;
+          show('otpError', (res.data && res.data.detail) || 'Incorrect code. Please try again.');
+          clearOtp(); boxes[0].focus(); return;
+        }
+        btn.textContent = 'Success — redirecting…'; signedIn(res.data);
+      })
+      .catch(function () { btn.textContent = 'Verify & continue'; btn.disabled = false; show('otpError', 'Network error. Is the API running?'); });
+    }
+
+    /* ---------- create new password (forced reset) ---------- */
+    function setNewPassword() {
+      hide('pwError');
+      var p1 = $('newPassword').value, p2 = $('newPassword2').value;
+      if (p1.length < 8) { show('pwError', 'Password must be at least 8 characters.'); return; }
+      if (p1 !== p2) { show('pwError', 'Passwords do not match. Please re-enter.'); return; }
+      var btn = $('setPwBtn'); btn.textContent = 'Saving…'; btn.disabled = true;
+      fetch(API + '/v1/auth/change-password', {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + currentToken },
+        body: JSON.stringify({ new_password: p1 })
+      })
+      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
+      .then(function (res) {
+        if (!res.ok) { btn.textContent = 'Set password & continue'; btn.disabled = false; show('pwError', (res.data && res.data.detail) || 'Could not set password. Please try again.'); return; }
+        var store = $('authRemember').checked ? localStorage : sessionStorage;
+        store.setItem('asc_token', res.data.access_token);
+        btn.textContent = 'Success — redirecting…'; redirectFor(currentRole);
+      })
+      .catch(function () { btn.textContent = 'Set password & continue'; btn.disabled = false; show('pwError', 'Network error. Is the API running?'); });
+    }
+
+    /* ---------- wire up ---------- */
+    $('signinBtn').addEventListener('click', passwordLogin);
+    $('otpMethodBtn').addEventListener('click', requestOtp);
+    $('authIdentifier').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); $('authPassword').focus(); } });
+    $('authPassword').addEventListener('keydown', function (e) { if (e.key === 'Enter') passwordLogin(); });
+    $('verifyOtpBtn').addEventListener('click', verify);
+    $('resendBtn').addEventListener('click', requestOtp);
+    $('backToIdBtn').addEventListener('click', function () { hide('otpError'); step('step-login'); $('authIdentifier').focus(); });
+    $('setPwBtn').addEventListener('click', setNewPassword);
+    $('newPassword2').addEventListener('keydown', function (e) { if (e.key === 'Enter') setNewPassword(); });
+  })();
+  </script>
+</body>
+</html>

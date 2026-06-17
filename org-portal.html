@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en-ZA">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0c1318" />
+  <title>Client Portal — ASC Pest Control</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/png" href="logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      --navy:#16202c; --navy-deep:#0c1318; --orange:#B02040; --orange-soft:#f7e3e8; --olive:#6B8E23; --olive-soft:#eef3e3;
+      --green:#36c172; --green-soft:#e7f7ee; --amber:#f5a623; --amber-soft:#fdf2dc;
+      --red:#e5484d; --red-soft:#fdecec; --blue:#3b82f6; --blue-soft:#e8f0fe;
+      --text:#1f2a36; --muted:#6b7785; --line:#e4e8ec; --bg:#eef1f4; --card:#fff;
+    }
+    *{box-sizing:border-box;}
+    body{margin:0;font-family:"Inter",system-ui,sans-serif;color:var(--text);background:var(--bg);}
+    a{color:inherit;text-decoration:none;}
+    .spin{display:inline-block;width:16px;height:16px;border:2px solid var(--line);border-top-color:var(--orange);border-radius:50%;animation:sp .7s linear infinite;}
+    @keyframes sp{to{transform:rotate(360deg);}}
+
+    .wrap{display:grid;grid-template-columns:248px 1fr;min-height:100vh;}
+    .side{background:var(--navy-deep);color:#cdd5dd;padding:18px 14px;position:sticky;top:0;height:100vh;overflow:auto;}
+    .brand{display:flex;align-items:center;gap:10px;padding:6px 8px 16px;}
+    .brand img{width:36px;height:36px;border-radius:9px;}
+    .brand b{font-family:"Sora";color:#fff;font-size:14px;line-height:1.1;}
+    .brand span{display:block;font-size:11px;color:#8a98a6;font-weight:400;}
+    .navlabel{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#5e6b78;margin:14px 8px 6px;font-weight:700;}
+    .nav{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;color:#cdd5dd;}
+    .nav:hover{background:#1b2632;color:#fff;}
+    .nav.active{background:var(--orange);color:#fff;}
+    .nav svg{flex:none;}
+    .side-foot{margin-top:18px;border-top:1px solid #1d2733;padding-top:12px;font-size:12px;}
+    .side-foot a{color:#8a98a6;display:block;padding:5px 8px;}
+    .side-foot a:hover{color:#fff;}
+
+    .main{min-width:0;}
+    .topbar{background:var(--card);border-bottom:1px solid var(--line);padding:14px 26px;display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:5;}
+    .topbar h1{font-family:"Sora";font-size:18px;margin:0;}
+    .topbar .who{font-size:12.5px;color:var(--muted);}
+    .content{padding:22px 26px;display:flex;flex-direction:column;gap:18px;}
+    .page{display:none;flex-direction:column;gap:18px;}
+    .page.active{display:flex;}
+
+    .btn{border:1px solid var(--line);background:#fff;color:var(--text);border-radius:9px;padding:8px 14px;font:600 13px "Inter";cursor:pointer;display:inline-flex;align-items:center;gap:7px;}
+    .btn:hover{border-color:var(--navy);}
+    .btn.primary{background:var(--orange);border-color:var(--orange);color:#fff;}
+    .btn.primary:hover{filter:brightness(1.06);}
+    .btn.sm{padding:6px 11px;font-size:12px;}
+
+    .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;}
+    .kpi{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:15px 17px;}
+    .kpi .lab{font-size:12px;color:var(--muted);font-weight:600;}
+    .kpi .v{font-family:"Sora";font-size:26px;font-weight:700;margin-top:5px;}
+    .kpi .sub{font-size:11.5px;color:var(--muted);margin-top:3px;}
+
+    .card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;}
+    .card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line);}
+    .card-head h3{font-family:"Sora";font-size:14.5px;margin:0;}
+    .card-head .meta{font-size:12px;color:var(--muted);}
+    .card-body{padding:16px 18px;}
+    .pad-table{padding:0;}
+
+    table{width:100%;border-collapse:collapse;font-size:13px;}
+    th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700;padding:11px 18px;border-bottom:1px solid var(--line);}
+    td{padding:12px 18px;border-bottom:1px solid var(--line);vertical-align:top;}
+    tr:last-child td{border-bottom:none;}
+    .t-strong{font-weight:600;}
+    .t-sub{color:var(--muted);font-size:12px;}
+    .t-mono{font-family:"Courier New",monospace;}
+    .empty{color:var(--muted);text-align:center;padding:26px 18px;font-size:13px;}
+
+    .badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;text-transform:capitalize;}
+    .b-green{background:var(--green-soft);color:#1f7a4d;}
+    .b-amber{background:var(--amber-soft);color:#8a6d00;}
+    .b-red{background:var(--red-soft);color:#b42318;}
+    .b-blue{background:var(--blue-soft);color:#1d4ed8;}
+    .b-grey{background:#eef1f4;color:#6b7785;}
+
+    .sites{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:13px;}
+    .site{border:1px solid var(--line);border-radius:12px;padding:14px;}
+    .site .dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:7px;}
+    .site h4{margin:0 0 3px;font-size:14px;font-family:"Sora";}
+    .site .addr{font-size:12px;color:var(--muted);line-height:1.4;}
+    .site .meta{font-size:11.5px;color:var(--muted);margin-top:8px;}
+
+    .info-note{background:var(--blue-soft);border:1px solid #cfe0fb;color:#1d4ed8;font-size:12.5px;padding:10px 13px;border-radius:9px;}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+    .check-list{list-style:none;margin:0;padding:0;}
+    .check-list li{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px;}
+    .check-list li:last-child{border-bottom:none;}
+    .ck{width:18px;height:18px;border-radius:5px;display:grid;place-items:center;font-size:11px;font-weight:800;color:#fff;flex:none;}
+    .ck.on{background:var(--green);} .ck.off{background:#cbd3da;}
+    .dl{display:grid;grid-template-columns:42% 58%;}
+    .dl dt{font-size:12px;color:var(--muted);font-weight:600;padding:9px 0;border-bottom:1px solid var(--line);}
+    .dl dd{font-size:13px;margin:0;padding:9px 0;border-bottom:1px solid var(--line);}
+    @media(max-width:860px){ .wrap{grid-template-columns:1fr;} .side{position:static;height:auto;} .grid-2{grid-template-columns:1fr;} }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <!-- Sidebar -->
+  <aside class="side">
+    <div class="brand">
+      <img src="logo.png" alt="ASC" />
+      <b>ASC Client Portal<span id="sideCompany">Loading…</span></b>
+    </div>
+
+    <div class="navlabel">Overview</div>
+    <div class="nav active" data-page="overview">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg> Dashboard
+    </div>
+    <div class="nav" data-page="services">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> Services
+    </div>
+    <div class="nav" data-page="pests">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg> Pest activity
+    </div>
+
+    <div class="navlabel">Compliance</div>
+    <div class="nav" data-page="audit">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg> Audit readiness
+    </div>
+    <div class="nav" data-page="documents">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Documents
+    </div>
+    <div class="nav" data-page="actions">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> Corrective actions
+    </div>
+
+    <div class="navlabel">Account</div>
+    <div class="nav" data-page="billing">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg> Billing
+    </div>
+    <div class="nav" data-page="team">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg> Team
+    </div>
+    <div class="nav" data-page="support">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Support
+    </div>
+
+    <div class="side-foot">
+      <a href="index.html">← Back to website</a>
+      <a id="signOut" href="#">Sign out</a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <h1 id="pageTitle">Dashboard</h1>
+      <div style="display:flex;align-items:center;gap:14px">
+        <span class="who" id="whoami">—</span>
+        <button class="btn sm" id="refreshBtn">Refresh</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- OVERVIEW -->
+      <div class="page active" id="page-overview">
+        <div class="kpis" id="overviewKpis">
+          <div class="kpi"><div class="lab">Sites</div><div class="v" id="k-sites">–</div><div class="sub">under management</div></div>
+          <div class="kpi"><div class="lab">Upcoming services</div><div class="v" id="k-upcoming">–</div><div class="sub">scheduled</div></div>
+          <div class="kpi"><div class="lab">Contract status</div><div class="v" id="k-status">–</div><div class="sub" id="k-status-sub">—</div></div>
+          <div class="kpi"><div class="lab">Monthly value</div><div class="v" id="k-value">–</div><div class="sub">recurring</div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>Multi-site status overview</h3><span class="meta" id="sitesMeta"></span></div>
+          <div class="card-body"><div class="sites" id="sitesGrid"><span class="spin"></span></div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>Next scheduled services</h3><button class="btn sm" id="icalBtn">⤓ Export to calendar (iCal)</button></div>
+          <div class="card-body pad-table">
+            <table>
+              <thead><tr><th>Date / time</th><th>Service</th><th>Site / location</th><th>Status</th></tr></thead>
+              <tbody id="upcomingTable"><tr><td colspan="4"><span class="spin"></span></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head"><h3>Open recommendations</h3></div>
+            <div class="card-body"><div class="info-note">Recommendations from your technician's site visits will appear here after your first monitored service.</div></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>Pest activity snapshot</h3></div>
+            <div class="card-body"><div class="info-note">Pest activity trends appear once monitoring devices are installed and your first inspection is logged.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SERVICES -->
+      <div class="page" id="page-services">
+        <div class="card">
+          <div class="card-head"><h3>Service history</h3><span class="meta" id="historyMeta"></span></div>
+          <div class="card-body pad-table">
+            <table>
+              <thead><tr><th>Reference</th><th>Date</th><th>Service</th><th>Site / location</th><th>Status</th><th>Report</th></tr></thead>
+              <tbody id="historyTable"><tr><td colspan="6"><span class="spin"></span></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PESTS -->
+      <div class="page" id="page-pests">
+        <div class="card">
+          <div class="card-head"><h3>Pest activity heat map</h3></div>
+          <div class="card-body"><div class="info-note">Heat-map and 30/90-day trends (cockroaches, rodents, flies, ants) are generated from monitoring-device readings and technician logs. This populates after your first monitored service cycle.</div></div>
+        </div>
+      </div>
+
+      <!-- AUDIT -->
+      <div class="page" id="page-audit">
+        <div class="card">
+          <div class="card-head"><h3>Audit readiness</h3><span class="meta" id="auditMeta"></span></div>
+          <div class="card-body">
+            <div id="certBlock"></div>
+            <ul class="check-list" style="margin-top:10px">
+              <li><span class="ck off">✕</span> Device mapping <span class="t-sub" style="margin-left:auto">Pending first service</span></li>
+              <li><span class="ck off">✕</span> Trend reports <span class="t-sub" style="margin-left:auto">Pending data</span></li>
+              <li><span class="ck off">✕</span> Treatment records <span class="t-sub" style="margin-left:auto">Pending first service</span></li>
+              <li><span class="ck off">✕</span> Corrective action log <span class="t-sub" style="margin-left:auto">No actions yet</span></li>
+              <li><span class="ck off">✕</span> Photo evidence <span class="t-sub" style="margin-left:auto">Pending first service</span></li>
+            </ul>
+            <div class="info-note" style="margin-top:12px">Audit-readiness percentages and the "ready for audit" countdown activate once service records start flowing in.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DOCUMENTS -->
+      <div class="page" id="page-documents">
+        <div class="card">
+          <div class="card-head">
+            <h3>Document library</h3>
+            <button class="btn sm" id="docShareBtn">✉ Share pack with auditor</button>
+          </div>
+          <div class="card-body pad-table">
+            <table>
+              <thead><tr><th>Document</th><th>Type</th><th>Reference</th><th>Date</th><th></th></tr></thead>
+              <tbody id="docsTable"><tr><td colspan="5"><span class="spin"></span></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CORRECTIVE ACTIONS -->
+      <div class="page" id="page-actions">
+        <div class="card">
+          <div class="card-head"><h3>Corrective action tracker</h3></div>
+          <div class="card-body"><div class="info-note">Open corrective actions (issue, root cause, owner, due date, evidence) will be tracked here as they're raised during service visits.</div></div>
+        </div>
+      </div>
+
+      <!-- BILLING -->
+      <div class="page" id="page-billing">
+        <div class="card">
+          <div class="card-head"><h3>Contract summary</h3></div>
+          <div class="card-body"><dl class="dl" id="contractDl"></dl></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Invoices</h3></div>
+          <div class="card-body pad-table">
+            <table>
+              <thead><tr><th>Invoice</th><th>Issued</th><th>Amount</th><th>Due</th><th>Status</th></tr></thead>
+              <tbody id="invoiceTable"><tr><td colspan="5" class="empty">No invoices issued yet.</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TEAM -->
+      <div class="page" id="page-team">
+        <div class="card">
+          <div class="card-head"><h3>Team &amp; access</h3></div>
+          <div class="card-body pad-table">
+            <table>
+              <thead><tr><th>Member</th><th>Role</th><th>Access</th></tr></thead>
+              <tbody id="teamTable"><tr><td colspan="3"><span class="spin"></span></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUPPORT -->
+      <div class="page" id="page-support">
+        <div class="card">
+          <div class="card-head"><h3>Support &amp; your account manager</h3></div>
+          <div class="card-body">
+            <p style="margin:0 0 14px;font-size:13.5px;line-height:1.6">Need help, a quote, or audit-prep guidance? Reach your ASC team directly, or ask <strong>Vera</strong>, our pest-management expert assistant.</p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <a class="btn primary" href="hub/vera.html">Ask Vera (AI expert)</a>
+              <a class="btn" href="mailto:support@ascfoodsafety.com">Email support</a>
+              <a class="btn" href="tel:+27410000000">Call us</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var API = (location.protocol === 'file:' || location.port === '5500' || location.port === '8080')
+    ? 'http://127.0.0.1:8000' : location.origin;
+
+  var token = localStorage.getItem('asc_token') || sessionStorage.getItem('asc_token');
+  var role  = localStorage.getItem('asc_role')  || sessionStorage.getItem('asc_role');
+  function toSignin(){ sessionStorage.setItem('asc_redirect', location.href); location.href = 'signin.html'; }
+  if (!token) { toSignin(); return; }
+
+  var $ = function(id){ return document.getElementById(id); };
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c];}); }
+  function money(n){ return 'R ' + Number(n||0).toLocaleString('en-ZA',{minimumFractionDigits:0,maximumFractionDigits:0}); }
+  function fmtDate(d){ if(!d) return '–'; var x=new Date(d); return isNaN(x)? esc(d) : x.toLocaleDateString('en-ZA',{day:'2-digit',month:'short',year:'numeric'}); }
+  var STATUS_BADGE={pending:'b-amber',confirmed:'b-blue',completed:'b-green',cancelled:'b-grey',active:'b-green',onboarding:'b-amber',awaiting_docs:'b-blue'};
+
+  /* nav */
+  var TITLES={overview:'Dashboard',services:'Services',pests:'Pest activity',audit:'Audit readiness',documents:'Documents',actions:'Corrective actions',billing:'Billing',team:'Team',support:'Support'};
+  document.querySelectorAll('.nav[data-page]').forEach(function(el){
+    el.addEventListener('click',function(){
+      var id=el.getAttribute('data-page');
+      document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+      document.querySelectorAll('.nav').forEach(function(n){n.classList.remove('active');});
+      $('page-'+id).classList.add('active'); el.classList.add('active');
+      $('pageTitle').textContent=TITLES[id]||id;
+    });
+  });
+  $('signOut').addEventListener('click',function(e){e.preventDefault();
+    ['asc_token','asc_role','asc_user_id','asc_branch_id'].forEach(function(k){localStorage.removeItem(k);sessionStorage.removeItem(k);});
+    location.href='signin.html';
+  });
+
+  var upcomingCache=[];
+
+  function load(){
+    fetch(API+'/v1/organisations/me',{headers:{'Authorization':'Bearer '+token}})
+      .then(function(r){ if(r.status===401){toSignin();return;} return r.json(); })
+      .then(function(d){ if(!d) return; render(d); })
+      .catch(function(){ $('sitesGrid').innerHTML='<div class="info-note">Could not reach the API. Is the server running?</div>'; });
+  }
+
+  function render(d){
+    var org=d.organisation;
+    $('whoami').textContent=d.contact_email||'';
+    if(!org){
+      $('sideCompany').textContent='No organisation';
+      $('sitesGrid').innerHTML='<div class="info-note">Your account isn’t linked to an organisation yet. Please contact ASC support.</div>';
+      $('upcomingTable').innerHTML='<tr><td colspan="4" class="empty">No services scheduled.</td></tr>';
+      $('historyTable').innerHTML='<tr><td colspan="6" class="empty">No service history yet.</td></tr>';
+      $('teamTable').innerHTML='<tr><td colspan="3" class="empty">No team members.</td></tr>';
+      return;
+    }
+    $('sideCompany').textContent=org.company_name;
+
+    /* KPIs */
+    $('k-sites').textContent=org.number_of_sites||org.sites.length||0;
+    $('k-status').textContent=String(org.status||'').replace('_',' ');
+    $('k-status-sub').textContent=org.service_level||'—';
+    $('k-value').textContent=money(org.monthly_contract_value);
+
+    /* sites */
+    var sm=$('sitesGrid');
+    if(org.sites && org.sites.length){
+      $('sitesMeta').textContent=org.sites.length+' site'+(org.sites.length>1?'s':'');
+      sm.innerHTML=org.sites.map(function(s){
+        return '<div class="site"><h4><span class="dot" style="background:var(--amber)"></span>'+esc(s.site_name)+'</h4>'+
+          '<div class="addr">'+esc(s.site_address||'')+'</div>'+
+          '<div class="meta">'+esc(s.site_type||'Site')+(s.square_meters?(' · '+esc(s.square_meters)+' m²'):'')+'</div>'+
+          '<div class="meta"><span class="badge b-amber">Awaiting first service</span></div></div>';
+      }).join('');
+    } else {
+      $('sitesMeta').textContent='';
+      sm.innerHTML='<div class="info-note">No sites recorded yet. Sites added during onboarding appear here.</div>';
+    }
+
+    /* bookings → upcoming + history */
+    var today=new Date().toISOString().slice(0,10);
+    var bookings=d.bookings||[];
+    var upcoming=bookings.filter(function(b){ return b.book_date && b.book_date>=today && b.status!=='cancelled' && b.status!=='completed'; })
+                         .sort(function(a,b){ return (a.book_date||'').localeCompare(b.book_date||''); });
+    upcomingCache=upcoming;
+    $('k-upcoming').textContent=upcoming.length;
+
+    $('upcomingTable').innerHTML = upcoming.length ? upcoming.map(function(b){
+      var cls=STATUS_BADGE[b.status]||'b-grey';
+      return '<tr><td class="t-strong">'+fmtDate(b.book_date)+(b.book_time?(' · '+esc(b.book_time)):'')+'</td>'+
+        '<td>'+esc(b.service)+'</td><td class="t-sub">'+esc(b.location||'—')+'</td>'+
+        '<td><span class="badge '+cls+'">'+esc(b.status)+'</span></td></tr>';
+    }).join('') : '<tr><td colspan="4" class="empty">No upcoming services scheduled. Use Support to request a booking.</td></tr>';
+
+    $('historyMeta').textContent=bookings.length+' record'+(bookings.length===1?'':'s');
+    $('historyTable').innerHTML = bookings.length ? bookings.map(function(b){
+      var cls=STATUS_BADGE[b.status]||'b-grey';
+      return '<tr><td class="t-strong t-mono">'+esc(b.reference)+'</td><td class="t-sub">'+fmtDate(b.book_date||b.created_at)+'</td>'+
+        '<td>'+esc(b.service)+'</td><td class="t-sub">'+esc(b.location||'—')+'</td>'+
+        '<td><span class="badge '+cls+'">'+esc(b.status)+'</span></td>'+
+        '<td>'+(b.status==='completed'?'<span class="t-sub">Report pending</span>':'<span class="t-sub">—</span>')+'</td></tr>';
+    }).join('') : '<tr><td colspan="6" class="empty">No service history yet.</td></tr>';
+
+    /* certifications checklist */
+    var certs=(org.details && org.details.food_certifications)||[];
+    $('auditMeta').textContent=org.requires_audit_ready?'Audit-ready required':'Standard';
+    $('certBlock').innerHTML = certs.length
+      ? '<div class="t-sub" style="margin-bottom:8px">Declared certifications</div><ul class="check-list">'+certs.map(function(c){
+          return '<li><span class="ck on">✓</span>'+esc(c)+'<span class="t-sub" style="margin-left:auto">Tracked</span></li>'; }).join('')+'</ul>'
+      : '<div class="info-note">No food-safety certifications were declared during onboarding.</div>';
+
+    /* contract */
+    var det=org.details||{};
+    $('contractDl').innerHTML=[
+      ['Company',org.company_name],['Industry',org.industry],
+      ['Service level',org.service_level||'—'],['Service frequency',org.service_frequency||'—'],
+      ['Contract type',org.contract_type||'—'],['Start date',org.contract_start_date?fmtDate(org.contract_start_date):'—'],
+      ['Monthly value',money(org.monthly_contract_value)],['Payment method',det.preferred_payment_method||'—'],
+      ['Billing email',det.billing_email||org.contact_email],['Sites covered',org.number_of_sites]
+    ].map(function(r){ return '<dt>'+esc(r[0])+'</dt><dd>'+esc(r[1])+'</dd>'; }).join('');
+
+    /* team */
+    var users=(det.additional_users)||[];
+    var rows='<tr><td class="t-strong">'+esc(org.contact_person_name)+'<div class="t-sub">'+esc(org.contact_email)+'</div></td><td><span class="badge b-blue">Owner</span></td><td class="t-sub">All sites</td></tr>';
+    rows+=users.map(function(u){
+      return '<tr><td class="t-strong">'+esc(u.email||'')+'</td><td><span class="badge b-grey">'+esc(u.role||'Viewer')+'</span></td><td class="t-sub">All sites</td></tr>';
+    }).join('');
+    $('teamTable').innerHTML=rows;
+
+    renderDocuments(org);
+  }
+
+  /* ── Document library (audit-ready compliance pack) ── */
+  var DOC_BADGE={ 'Service report':'b-blue','Site map':'b-grey','Trend report':'b-green',
+                  'Corrective actions':'b-amber','Certificate':'b-green','Compliance':'b-blue' };
+  function renderDocuments(org){
+    // Standard ASC compliance document pack (PDFs served from assets/docs/).
+    var docs=[
+      { name:'Service Visit Report — May 2026', type:'Service report', ref:'SR-2026-0512', date:'2026-05-20', file:'service-report-2026-05.pdf' },
+      { name:'Pest Monitoring Device Register & Site Map', type:'Site map', ref:'DR-2026-0188', date:'2026-05-20', file:'device-register-site-map.pdf' },
+      { name:'Quarterly Pest Activity Trend Report — Q2', type:'Trend report', ref:'TR-2026-Q2', date:'2026-06-30', file:'trend-report-q2-2026.pdf' },
+      { name:'Corrective Action Log', type:'Corrective actions', ref:'CAL-2026-031', date:'2026-05-20', file:'corrective-action-log.pdf' },
+      { name:'Certificate of Disinfection', type:'Certificate', ref:'COD-2026-0440', date:'2026-05-18', file:'certificate-of-disinfection.pdf' },
+      { name:'Compliance & Registration Statement', type:'Compliance', ref:'CRS-2026-007', date:'2026-05-20', file:'compliance-registration-statement.pdf' }
+    ];
+    var body=$('docsTable');
+    body.innerHTML=docs.map(function(dc){
+      var cls=DOC_BADGE[dc.type]||'b-grey';
+      var url='assets/docs/'+dc.file;
+      return '<tr>'+
+        '<td class="t-strong">'+esc(dc.name)+'</td>'+
+        '<td><span class="badge '+cls+'">'+esc(dc.type)+'</span></td>'+
+        '<td class="t-sub t-mono">'+esc(dc.ref)+'</td>'+
+        '<td class="t-sub">'+fmtDate(dc.date)+'</td>'+
+        '<td><a class="btn sm" href="'+url+'" target="_blank" rel="noopener" download>⤓ PDF</a></td>'+
+      '</tr>';
+    }).join('');
+    window._ascDocs=docs;
+  }
+  document.getElementById('docShareBtn').addEventListener('click',function(){
+    var subject=encodeURIComponent('ASC Pest Control — compliance document pack');
+    var body=encodeURIComponent('Please find our current ASC Pest Control audit-ready documentation:\n\n'+
+      (window._ascDocs||[]).map(function(d){ return '• '+d.name+' ('+d.ref+')'; }).join('\n')+
+      '\n\nDocuments are available in our client portal.');
+    location.href='mailto:?subject='+subject+'&body='+body;
+  });
+
+  /* iCal export of upcoming services */
+  $('icalBtn').addEventListener('click',function(){
+    if(!upcomingCache.length){ alert('No upcoming services to export.'); return; }
+    function pad(n){return (n<10?'0':'')+n;}
+    function dt(d,t){ var p=(d||'').split('-'); var hm=(t||'09:00').split(':');
+      return p[0]+pad(+p[1])+pad(+p[2])+'T'+pad(+(hm[0]||9))+pad(+(hm[1]||0))+'00'; }
+    var lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//ASC Pest Control//Client Portal//EN'];
+    upcomingCache.forEach(function(b){
+      lines.push('BEGIN:VEVENT','UID:'+(b.reference||Math.random())+'@ascfoodsafety.com',
+        'DTSTART:'+dt(b.book_date,b.book_time),'SUMMARY:ASC Pest Control — '+(b.service||'Service'),
+        'LOCATION:'+(b.location||'').replace(/[,;]/g,' '),'DESCRIPTION:Reference '+(b.reference||''),'END:VEVENT');
+    });
+    lines.push('END:VCALENDAR');
+    var blob=new Blob([lines.join('\r\n')],{type:'text/calendar'});
+    var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='asc-services.ics'; a.click();
+  });
+
+  $('refreshBtn').addEventListener('click',load);
+  load();
+})();
+</script>
+</body>
+</html>

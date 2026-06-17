@@ -1,0 +1,1530 @@
+<!DOCTYPE html>
+<html lang="en-ZA">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Operations Dashboard · ASC Pest Control Hub</title>
+  <link rel="icon" type="image/png" href="logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Design tokens ── */
+    :root {
+      --bg:        #0b0f15;
+      --bg-alt:    #0f141b;
+      --surface:   #141b24;
+      --surface-2: #1a212b;
+      --surface-3: #1e2733;
+      --line:      #232d3a;
+      --fg:        #eef1f4;
+      --muted:     #8a96a3;
+      --muted-2:   #5a6470;
+      --orange:    #B02040;
+      --orange-s:  rgba(176,32,64,.14);
+      --olive:     #6B8E23;
+      --olive-s:   rgba(107,142,35,.16);
+      --green:     #22c55e;
+      --green-s:   rgba(34,197,94,.12);
+      --amber:     #f59e0b;
+      --amber-s:   rgba(245,158,11,.12);
+      --blue:      #60a5fa;
+      --blue-s:    rgba(96,165,250,.12);
+      --red:       #f87171;
+      --red-s:     rgba(248,113,113,.12);
+      --purple:    #a78bfa;
+      --purple-s:  rgba(167,139,250,.12);
+      --font: "Inter", system-ui, sans-serif;
+      --radius: 12px;
+      --radius-lg: 18px;
+      --side-w: 230px;
+      --top-h: 62px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 15px; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--fg);
+      display: flex;
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* ── Sidebar ── */
+    .side {
+      width: var(--side-w);
+      min-height: 100vh;
+      background: var(--surface);
+      border-right: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 100;
+      padding: 0 0 1rem;
+      transition: transform .25s;
+    }
+    .side-logo {
+      display: flex;
+      align-items: center;
+      gap: .65rem;
+      padding: 1.1rem 1.25rem;
+      border-bottom: 1px solid var(--line);
+      text-decoration: none;
+    }
+    .side-logo img { width: 30px; height: 30px; border-radius: 6px; }
+    .side-logo-text { font-size: .82rem; font-weight: 700; color: var(--fg); line-height: 1.2; }
+    .side-logo-text small { display: block; font-weight: 400; color: var(--muted); font-size: .72rem; }
+
+    .who {
+      display: flex;
+      align-items: center;
+      gap: .65rem;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--line);
+    }
+    .av {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      background: var(--orange);
+      color: #fff;
+      font-size: .7rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .who-info .nm { font-size: .8rem; font-weight: 700; }
+    .who-info .rl { font-size: .71rem; color: var(--muted); }
+
+    .navlabel {
+      font-size: .67rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--muted-2);
+      padding: 1.1rem 1.25rem .35rem;
+    }
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      padding: .52rem 1.25rem;
+      font-size: .82rem;
+      font-weight: 500;
+      color: var(--muted);
+      text-decoration: none;
+      border-radius: 0;
+      cursor: pointer;
+      transition: background .15s, color .15s;
+      border-left: 3px solid transparent;
+    }
+    .nav-link:hover { background: var(--surface-2); color: var(--fg); }
+    .nav-link.active { background: var(--surface-2); color: var(--fg); border-left-color: var(--orange); }
+    .nav-link svg { opacity: .6; flex-shrink: 0; }
+    .nav-link.active svg { opacity: 1; }
+
+    .side-foot {
+      margin-top: auto;
+      padding: .75rem 1.25rem;
+      font-size: .7rem;
+      color: var(--muted-2);
+      border-top: 1px solid var(--line);
+    }
+    .side-foot a { color: var(--muted); text-decoration: none; }
+    .side-foot a:hover { color: var(--fg); }
+
+    /* ── Main area ── */
+    .main-wrap {
+      margin-left: var(--side-w);
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Top bar ── */
+    .topbar {
+      height: var(--top-h);
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.75rem;
+      position: sticky; top: 0; z-index: 50;
+      gap: 1rem;
+    }
+    .topbar-left h1 { font-size: 1rem; font-weight: 700; }
+    .topbar-left .sub { font-size: .75rem; color: var(--muted); margin-top: .1rem; }
+    .topbar-right { display: flex; align-items: center; gap: .65rem; }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: .4rem;
+      padding: .5rem 1rem; border-radius: var(--radius);
+      font-size: .8rem; font-weight: 600; cursor: pointer;
+      border: 1px solid transparent; transition: background .15s, border-color .15s, opacity .15s;
+      text-decoration: none; white-space: nowrap;
+    }
+    .btn-primary { background: var(--orange); color: #fff; border-color: var(--orange); }
+    .btn-primary:hover { background: #d94418; border-color: #d94418; }
+    .btn-ghost { background: transparent; color: var(--fg); border-color: var(--line); }
+    .btn-ghost:hover { background: var(--surface-2); }
+    .btn-sm { padding: .35rem .75rem; font-size: .75rem; }
+    .btn-danger { background: var(--red-s); color: var(--red); border-color: transparent; }
+    .btn-danger:hover { background: rgba(248,113,113,.22); }
+
+    /* ── Page content ── */
+    .page-content { padding: 1.5rem 1.75rem; display: none; flex-direction: column; gap: 1.25rem; }
+    .page-content.active { display: flex; }
+
+    /* ── Stats grid ── */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+    @media (max-width: 1100px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 1.1rem 1.25rem;
+    }
+    .stat-card .lab { font-size: .75rem; color: var(--muted); font-weight: 600; margin-bottom: .4rem; }
+    .stat-card .v { font-size: 1.9rem; font-weight: 800; letter-spacing: -.03em; line-height: 1; margin-bottom: .35rem; }
+    .stat-card .delta { font-size: .72rem; font-weight: 600; }
+    .delta.up { color: var(--green); }
+    .delta.down { color: var(--red); }
+    .delta.flat { color: var(--muted); }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .card-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--line);
+    }
+    .card-head h3 { font-size: .88rem; font-weight: 700; }
+    .card-head a { font-size: .75rem; color: var(--orange); text-decoration: none; }
+    .card-head a:hover { text-decoration: underline; }
+    .card-body { padding: 1rem 1.25rem; }
+    .card-body.pad-table { padding: .25rem 0; }
+
+    /* ── Two-col grid ── */
+    .cols-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+    @media (max-width: 900px) { .cols-2 { grid-template-columns: 1fr; } }
+
+    /* ── Kanban ── */
+    .kanban { display: grid; grid-template-columns: repeat(4, 1fr); gap: .75rem; }
+    @media (max-width: 1200px) { .kanban { grid-template-columns: repeat(2, 1fr); } }
+    .k-col { display: flex; flex-direction: column; gap: .5rem; }
+    .k-head {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: .72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .07em; color: var(--muted); padding-bottom: .4rem;
+      border-bottom: 1px solid var(--line);
+    }
+    .k-head span:last-child {
+      background: var(--surface-2); border-radius: 20px;
+      padding: .1rem .45rem; font-size: .7rem;
+    }
+    .k-card {
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: .7rem .8rem;
+    }
+    .k-name { font-size: .8rem; font-weight: 700; margin-bottom: .2rem; }
+    .k-sub { font-size: .72rem; color: var(--muted); margin-bottom: .4rem; }
+
+    /* ── Badges ── */
+    .badge {
+      display: inline-flex; align-items: center;
+      padding: .15rem .55rem; border-radius: 20px;
+      font-size: .68rem; font-weight: 700; letter-spacing: .02em;
+    }
+    .b-green  { background: var(--green-s);  color: var(--green); }
+    .b-amber  { background: var(--amber-s);  color: var(--amber); }
+    .b-blue   { background: var(--blue-s);   color: var(--blue); }
+    .b-red    { background: var(--red-s);    color: var(--red); }
+    .b-grey   { background: var(--surface-3); color: var(--muted); }
+    .b-orange { background: var(--orange-s); color: var(--orange); }
+    .b-purple { background: var(--purple-s); color: var(--purple); }
+
+    /* ── Tables ── */
+    table { width: 100%; border-collapse: collapse; font-size: .8rem; }
+    th { text-align: left; padding: .6rem 1.25rem; font-size: .7rem; font-weight: 700;
+         text-transform: uppercase; letter-spacing: .06em; color: var(--muted); border-bottom: 1px solid var(--line); }
+    td { padding: .7rem 1.25rem; border-bottom: 1px solid var(--line); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--surface-2); }
+    .t-strong { font-weight: 700; }
+    .t-sub { font-size: .71rem; color: var(--muted); margin-top: .15rem; }
+    .t-mono { font-family: "SF Mono", "Fira Code", monospace; font-size: .75rem; }
+
+    /* ── Technician rows ── */
+    .tech-list { display: flex; flex-direction: column; gap: .65rem; }
+    .tech-row { display: flex; align-items: center; gap: .75rem; }
+    .tech-av {
+      width: 34px; height: 34px; border-radius: 9px;
+      background: var(--surface-3); color: var(--fg);
+      font-size: .7rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .tech-info { flex: 1; min-width: 0; }
+    .tech-name { font-size: .8rem; font-weight: 700; }
+    .tech-meta { font-size: .71rem; color: var(--muted); }
+    .progress-bar { height: 5px; background: var(--surface-3); border-radius: 3px; margin-top: 6px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 3px; }
+
+    /* ── Notification dot ── */
+    .notif-btn { position: relative; }
+    .notif-dot {
+      position: absolute; top: 3px; right: 3px;
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--orange);
+    }
+
+    /* ── Empty state ── */
+    .empty { text-align: center; padding: 2.5rem 1rem; color: var(--muted); font-size: .82rem; }
+    .empty svg { opacity: .3; margin-bottom: .75rem; display: block; margin-inline: auto; }
+
+    /* ── Loading spinner ── */
+    .spin {
+      width: 20px; height: 20px;
+      border: 2px solid var(--line);
+      border-top-color: var(--orange);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      margin: 2rem auto; display: block;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── API status bar ── */
+    .api-bar {
+      display: flex; align-items: center; gap: .5rem;
+      font-size: .72rem; color: var(--muted);
+      padding: .4rem .75rem;
+      background: var(--surface-2);
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+    }
+    .api-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+    .api-dot.offline { background: var(--red); }
+
+    /* ── Profile dropdown ── */
+    .profile-btn {
+      display: flex; align-items: center; gap: .5rem;
+      background: var(--surface-2); border: 1px solid var(--line);
+      border-radius: var(--radius); padding: .4rem .75rem;
+      font-size: .78rem; font-weight: 600; color: var(--fg);
+      cursor: pointer; transition: background .15s;
+    }
+    .profile-btn:hover { background: var(--surface-3); }
+
+    /* ── Mobile hamburger ── */
+    .mob-toggle {
+      display: none; background: none; border: none;
+      color: var(--fg); cursor: pointer; padding: .4rem;
+    }
+    @media (max-width: 768px) {
+      .side { transform: translateX(-100%); }
+      .side.open { transform: translateX(0); }
+      .main-wrap { margin-left: 0; }
+      .mob-toggle { display: flex; }
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .kanban { grid-template-columns: 1fr; }
+      .page-content { padding: 1rem; }
+      .topbar { padding: 0 1rem; }
+    }
+
+    /* ── Overlay (mobile) ── */
+    .side-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 99;
+    }
+    .side-overlay.open { display: block; }
+
+    /* ── Access denied overlay ── */
+    #access-gate {
+      position: fixed; inset: 0; background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9999; flex-direction: column; gap: 1rem; text-align: center;
+    }
+    #access-gate h2 { font-size: 1.4rem; }
+    #access-gate p { color: var(--muted); max-width: 340px; }
+
+    /* ── Quick stats mini chart ── */
+    .mini-chart { display: flex; align-items: flex-end; gap: 2px; height: 32px; }
+    .mini-bar { flex: 1; background: var(--orange-s); border-radius: 2px; min-height: 4px; }
+    .mini-bar.hi { background: var(--orange); }
+  </style>
+</head>
+<body>
+
+<!-- Auth gate — shown while checking, hidden on success -->
+<div id="access-gate">
+  <span class="spin"></span>
+  <p style="color:var(--muted);font-size:.85rem">Verifying access…</p>
+</div>
+
+<!-- Sidebar overlay (mobile) -->
+<div class="side-overlay" id="sideOverlay"></div>
+
+<!-- ══════════════ SIDEBAR ══════════════ -->
+<aside class="side" id="sidebar">
+  <a class="side-logo" href="index.html">
+    <img src="logo.png" alt="ASC" />
+    <span class="side-logo-text">ASC Pest Control<small>Operations Hub</small></span>
+  </a>
+
+  <div class="who">
+    <div class="av" id="sideAv">AS</div>
+    <div class="who-info">
+      <div class="nm" id="sideName">ASC Operations</div>
+      <div class="rl" id="sideRole">Admin · Gqeberha</div>
+    </div>
+  </div>
+
+  <div class="navlabel">Operations</div>
+  <a class="nav-link active" data-page="dashboard">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>
+    Dashboard
+  </a>
+  <a class="nav-link" data-page="leads">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg>
+    Leads / CRM
+  </a>
+  <a class="nav-link" data-page="scheduling">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+    Scheduling
+  </a>
+  <a class="nav-link" data-page="customers">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Customers
+  </a>
+  <a class="nav-link" data-page="organisations">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/><path d="M9 9v.01M9 12v.01M9 15v.01M9 18v.01"/></svg>
+    Organisations
+  </a>
+  <a class="nav-link" data-page="invoices">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
+    Invoices
+  </a>
+
+  <div class="navlabel">Field</div>
+  <a class="nav-link" data-page="technicians">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/></svg>
+    Technicians
+  </a>
+  <a class="nav-link" data-page="reports">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h9l5 5v15H6z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
+    Service Reports
+  </a>
+
+  <div class="side-foot">
+    <a href="index.html">← Back to website</a><br/>
+    ASC Pest Control Hub
+  </div>
+</aside>
+
+<!-- ══════════════ MAIN ══════════════ -->
+<div class="main-wrap">
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:.75rem">
+      <button class="mob-toggle" id="mobToggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="topbar-left">
+        <h1 id="pageTitle">Operations Dashboard</h1>
+        <div class="sub" id="pageDate"></div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="api-bar" id="apiStatus">
+        <span class="api-dot" id="apiDot"></span>
+        <span id="apiLabel">Connecting…</span>
+      </div>
+      <button class="btn btn-ghost btn-sm notif-btn">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="notif-dot"></span>
+      </button>
+      <div class="profile-btn" id="profileBtn">
+        <div class="av" style="width:24px;height:24px;font-size:.62rem;border-radius:6px" id="topAv">AS</div>
+        <span id="topName">Admin</span>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="signOutBtn">Sign out</button>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: DASHBOARD ══ -->
+  <div class="page-content active" id="page-dashboard">
+
+    <!-- Action row -->
+    <div style="display:flex;gap:.65rem;flex-wrap:wrap">
+      <button class="btn btn-ghost btn-sm">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        New booking
+      </button>
+      <button class="btn btn-primary btn-sm">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        New invoice
+      </button>
+      <button class="btn btn-ghost btn-sm" id="refreshBtn">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        Refresh
+      </button>
+    </div>
+
+    <!-- Stats row -->
+    <div class="stats-row" id="statsRow">
+      <div class="stat-card"><div class="lab">Leads this week</div><div class="v" id="s-leads">–</div><div class="delta up" id="s-leads-d">Loading…</div></div>
+      <div class="stat-card stat-link" id="bookingsStat" role="button" tabindex="0" title="View all website bookings"><div class="lab">Bookings today</div><div class="v" id="s-bookings">–</div><div class="delta flat">View all bookings →</div></div>
+      <div class="stat-card"><div class="lab">Revenue (MTD)</div><div class="v" id="s-revenue">–</div><div class="delta flat">No data yet</div></div>
+      <div class="stat-card"><div class="lab">Overdue invoices</div><div class="v" id="s-overdue">–</div><div class="delta flat">No data yet</div></div>
+    </div>
+
+    <!-- Lead pipeline kanban -->
+    <div class="card">
+      <div class="card-head">
+        <h3>Lead pipeline</h3>
+        <a href="#" data-page="leads" class="nav-shortcut">Open CRM</a>
+      </div>
+      <div class="card-body">
+        <div class="kanban" id="kanbanBoard">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Schedule + Technician load -->
+    <div class="cols-2">
+      <div class="card">
+        <div class="card-head"><h3>Today's schedule</h3><a href="#" data-page="scheduling" class="nav-shortcut">Full calendar</a></div>
+        <div class="card-body pad-table">
+          <table>
+            <thead><tr><th>Time</th><th>Job</th><th>Technician</th><th>Status</th></tr></thead>
+            <tbody id="scheduleBody">
+              <tr><td colspan="4"><span class="spin"></span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>Technician load — today</h3><a href="#" data-page="technicians" class="nav-shortcut">Manage</a></div>
+        <div class="card-body">
+          <div class="tech-list" id="techList">
+            <span class="spin"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent invoices -->
+    <div class="card">
+      <div class="card-head"><h3>Recent invoices</h3><a href="#" data-page="invoices" class="nav-shortcut">All invoices</a></div>
+      <div class="card-body pad-table">
+        <table>
+          <thead><tr><th>Invoice</th><th>Client</th><th>Amount</th><th>Issued</th><th>Status</th></tr></thead>
+          <tbody id="invoicesBody">
+            <tr><td colspan="5"><span class="spin"></span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /page-dashboard -->
+
+  <!-- ══ PAGE: LEADS ══ -->
+  <div class="page-content" id="page-leads">
+    <div style="display:flex;gap:.65rem;flex-wrap:wrap">
+      <button class="btn btn-primary btn-sm">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        New lead
+      </button>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>All leads</h3><span id="leadsTotal" style="font-size:.75rem;color:var(--muted)"></span></div>
+      <div class="card-body pad-table">
+        <table>
+          <thead><tr><th>Reference</th><th>Source</th><th>Service</th><th>Status</th><th>Created</th></tr></thead>
+          <tbody id="leadsTable"><tr><td colspan="5"><span class="spin"></span></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" id="bookingsAnchor">
+      <div class="card-head"><h3>Commercial &amp; industrial bookings</h3><span id="commTotal" style="font-size:.75rem;color:var(--muted)"></span></div>
+      <div class="card-body pad-table">
+        <table>
+          <thead><tr><th>Reference</th><th>Customer</th><th>Service</th><th>Date / time</th><th>Region</th><th>Status</th><th>Received</th></tr></thead>
+          <tbody id="bookingsCommTable"><tr><td colspan="7"><span class="spin"></span></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h3>Residential bookings</h3><span id="resTotal" style="font-size:.75rem;color:var(--muted)"></span></div>
+      <div class="card-body pad-table">
+        <table>
+          <thead><tr><th>Reference</th><th>Customer</th><th>Service</th><th>Date / time</th><th>Region</th><th>Status</th><th>Received</th></tr></thead>
+          <tbody id="bookingsResTable"><tr><td colspan="7"><span class="spin"></span></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h3>Website enquiries</h3><span id="enquiriesTotal" style="font-size:.75rem;color:var(--muted)"></span></div>
+      <div class="card-body pad-table">
+        <table>
+          <thead><tr><th>Customer</th><th>About</th><th>Type</th><th>Service</th><th>Region</th><th>Status</th><th>Received</th></tr></thead>
+          <tbody id="enquiriesTable"><tr><td colspan="7"><span class="spin"></span></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: SCHEDULING ══ -->
+  <div class="page-content" id="page-scheduling">
+    <div class="card">
+      <div class="card-head"><h3>Schedule — today</h3></div>
+      <div class="card-body pad-table">
+        <table>
+          <thead><tr><th>Time</th><th>Job</th><th>Technician</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="schedFull">
+            <tr><td colspan="5" class="empty">No jobs scheduled yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: ORGANISATIONS ══ -->
+  <div class="page-content" id="page-organisations">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:.75rem;flex-wrap:wrap">
+      <div class="stats-row" style="flex:1;min-width:0">
+        <div class="stat-card"><div class="lab">Total organisations</div><div class="v" id="org-total">–</div><div class="delta flat">onboarded</div></div>
+        <div class="stat-card"><div class="lab">Active contracts</div><div class="v" id="org-active">–</div><div class="delta flat">live</div></div>
+        <div class="stat-card"><div class="lab">Pending onboarding</div><div class="v" id="org-pending">–</div><div class="delta flat">in progress</div></div>
+        <div class="stat-card"><div class="lab">Monthly contract value</div><div class="v" id="org-value">–</div><div class="delta flat">recurring</div></div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end">
+      <button class="btn btn-primary btn-sm" id="onboardBtn">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        Onboard new organisation
+      </button>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>Organisations</h3><span id="orgTotalLbl" style="font-size:.75rem;color:var(--muted)"></span></div>
+      <div class="card-body pad-table">
+        <table>
+          <thead><tr><th>Company</th><th>Industry</th><th>Sites</th><th>Service level</th><th>Status</th><th>Monthly value</th></tr></thead>
+          <tbody id="orgTable"><tr><td colspan="6"><span class="spin"></span></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: CUSTOMERS ══ -->
+  <div class="page-content" id="page-customers">
+    <div class="card">
+      <div class="card-head"><h3>Customers</h3></div>
+      <div class="card-body pad-table">
+        <table>
+          <thead><tr><th>Name</th><th>Type</th><th>Last service</th><th>Next due</th><th>Status</th></tr></thead>
+          <tbody id="customersBody">
+            <tr><td colspan="5" class="empty">No customers yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: INVOICES ══ -->
+  <div class="page-content" id="page-invoices">
+    <div style="display:flex;gap:.65rem">
+      <button class="btn btn-primary btn-sm">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        New invoice
+      </button>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>All invoices</h3></div>
+      <div class="card-body pad-table">
+        <table>
+          <thead><tr><th>Invoice</th><th>Client</th><th>Amount</th><th>Issued</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="invoicesFullBody">
+            <tr><td colspan="6" class="empty">No invoices yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: TECHNICIANS ══ -->
+  <div class="page-content" id="page-technicians">
+    <div class="card">
+      <div class="card-head"><h3>Field technicians</h3></div>
+      <div class="card-body">
+        <div class="tech-list" id="techFullList">
+          <div class="empty" style="padding:1rem">No technicians yet.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: REPORTS ══ -->
+  <div class="page-content" id="page-reports">
+    <div class="card">
+      <div class="card-head"><h3>Service reports</h3></div>
+      <div class="card-body pad-table">
+        <table>
+          <thead><tr><th>Report</th><th>Client</th><th>Technician</th><th>Date</th><th>Audit status</th></tr></thead>
+          <tbody id="reportsBody">
+            <tr><td colspan="5" class="empty">No service reports yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main-wrap -->
+
+<!-- ══ Booking detail modal ══ -->
+<div id="bkModal" class="bk-modal-overlay" aria-hidden="true">
+  <div class="bk-modal" role="dialog" aria-modal="true" aria-labelledby="bkModalTitle">
+    <div class="bk-modal-head">
+      <div>
+        <div class="bk-modal-kicker" id="bkModalKicker">Booking</div>
+        <h3 id="bkModalTitle">Booking detail</h3>
+      </div>
+      <button type="button" class="bk-modal-close" id="bkModalClose" aria-label="Close">&times;</button>
+    </div>
+    <div class="bk-modal-body" id="bkModalBody"></div>
+    <div class="bk-modal-foot">
+      <span class="bk-modal-status">Status: <span id="bkModalStatus" class="badge b-grey">–</span></span>
+      <div class="bk-modal-actions" id="bkModalActions"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Organisation onboarding modal (4 phases) ══ -->
+<div id="orgModal" class="bk-modal-overlay" aria-hidden="true">
+  <div class="bk-modal" role="dialog" aria-modal="true" aria-labelledby="orgModalTitle" style="width:680px">
+    <div class="bk-modal-head">
+      <div>
+        <div class="bk-modal-kicker">Onboard organisation</div>
+        <h3 id="orgModalTitle">New organisation</h3>
+      </div>
+      <button type="button" class="bk-modal-close" id="orgModalClose" aria-label="Close">&times;</button>
+    </div>
+
+    <div class="org-steps" id="orgSteps">
+      <div class="org-step on" data-step="1"><span>1</span> Details</div>
+      <div class="org-step" data-step="2"><span>2</span> Compliance &amp; site</div>
+      <div class="org-step" data-step="3"><span>3</span> Users &amp; billing</div>
+      <div class="org-step" data-step="4"><span>4</span> Consent</div>
+    </div>
+
+    <form id="orgForm" novalidate>
+      <div class="bk-modal-body">
+
+        <!-- Phase 1 -->
+        <div class="org-phase on" data-phase="1">
+          <div class="org-grid">
+            <label class="f2">Company name *<input name="company_name" required></label>
+            <label>Registration number<input name="registration_number"></label>
+            <label>VAT / Tax ID<input name="vat_id"></label>
+            <label>Industry *
+              <select name="industry" required>
+                <option value="">Select…</option>
+                <option>Food &amp; Beverage</option><option>Healthcare</option><option>Hospitality</option>
+                <option>Education</option><option>Corporate</option><option>Retail</option>
+                <option>Residential</option><option>Other</option>
+              </select>
+            </label>
+            <label>Company size
+              <select name="company_size">
+                <option value="">Select…</option>
+                <option>1-10 staff</option><option>11-50</option><option>51-200</option><option>200+</option>
+              </select>
+            </label>
+          </div>
+          <div class="org-sub">Primary contact (becomes the account owner)</div>
+          <div class="org-grid">
+            <label>Contact name *<input name="contact_person_name" required></label>
+            <label>Role at company
+              <select name="role_at_company">
+                <option value="">Select…</option>
+                <option>Owner</option><option>Manager</option><option>Facilities Manager</option>
+                <option>Quality Officer</option><option>Food Safety Officer</option><option>Other</option>
+              </select>
+            </label>
+            <label>Contact email *<input name="contact_email" type="email" required></label>
+            <label>Contact phone *<input name="contact_phone" required></label>
+          </div>
+          <div class="org-sub">Service qualification</div>
+          <div class="org-grid">
+            <label>Number of sites<input name="number_of_sites" type="number" min="1" value="1"></label>
+            <label>Service frequency
+              <select name="service_frequency">
+                <option value="">Select…</option>
+                <option>Once-off</option><option>Monthly</option><option>Quarterly</option><option>Annual</option><option>Custom</option>
+              </select>
+            </label>
+          </div>
+          <div class="org-fieldset f2">
+            <span class="org-legend">Current pest concerns</span>
+            <div class="org-checks">
+              <label><input type="checkbox" name="pest_concerns" value="Cockroaches"> Cockroaches</label>
+              <label><input type="checkbox" name="pest_concerns" value="Rodents"> Rodents</label>
+              <label><input type="checkbox" name="pest_concerns" value="Flies"> Flies</label>
+              <label><input type="checkbox" name="pest_concerns" value="Ants"> Ants</label>
+              <label><input type="checkbox" name="pest_concerns" value="Termites"> Termites</label>
+              <label><input type="checkbox" name="pest_concerns" value="Bed Bugs"> Bed Bugs</label>
+              <label><input type="checkbox" name="pest_concerns" value="Other"> Other</label>
+            </div>
+          </div>
+          <label class="f2">Primary problem<textarea name="primary_problem" rows="2" placeholder="Describe the current issue…"></textarea></label>
+        </div>
+
+        <!-- Phase 2 -->
+        <div class="org-phase" data-phase="2">
+          <div class="org-sub">Compliance requirements</div>
+          <label class="org-inline"><input type="checkbox" name="requires_audit_ready"> Requires audit-ready compliance documentation</label>
+          <div class="org-fieldset f2">
+            <span class="org-legend">Food certifications</span>
+            <div class="org-checks">
+              <label><input type="checkbox" name="food_certifications" value="HACCP"> HACCP</label>
+              <label><input type="checkbox" name="food_certifications" value="BRCGS"> BRCGS</label>
+              <label><input type="checkbox" name="food_certifications" value="FSSC 22000"> FSSC 22000</label>
+              <label><input type="checkbox" name="food_certifications" value="IFS"> IFS</label>
+              <label><input type="checkbox" name="food_certifications" value="BRC"> BRC</label>
+            </div>
+          </div>
+          <div class="org-grid">
+            <label>Audit frequency
+              <select name="audit_frequency">
+                <option value="">None</option><option>Monthly</option><option>Quarterly</option><option>Annually</option>
+              </select>
+            </label>
+            <label>Compliance officer email<input name="compliance_officer_email" type="email"></label>
+          </div>
+          <div class="org-sub">First site (add more later)</div>
+          <div class="org-grid">
+            <label>Site name<input name="site_name" placeholder="Head Office, Processing Plant…"></label>
+            <label>Site type
+              <select name="site_type">
+                <option value="">Select…</option>
+                <option>Factory</option><option>Office</option><option>Warehouse</option><option>Retail</option>
+                <option>Residential</option><option>Healthcare</option><option>Education</option><option>Other</option>
+              </select>
+            </label>
+            <label class="f2">Site address<input name="site_address" placeholder="Full address"></label>
+            <label class="f2">Access notes<textarea name="access_notes" rows="2" placeholder="Gate code, dog in yard, back entrance…"></textarea></label>
+            <label>On-site contact name<input name="site_contact_name"></label>
+            <label>On-site contact phone<input name="site_contact_phone"></label>
+            <label>Approx. size (m²)<input name="square_meters" type="number" min="0"></label>
+          </div>
+        </div>
+
+        <!-- Phase 3 -->
+        <div class="org-phase" data-phase="3">
+          <div class="org-sub">Additional users (optional — comma-separated emails)</div>
+          <label class="f2">Invite team members<input name="additional_user_emails" placeholder="jane@co.za, sam@co.za"></label>
+          <div class="org-grid">
+            <label>Default role for invitees
+              <select name="user_role">
+                <option>Viewer</option><option>Manager</option><option>Admin</option>
+              </select>
+            </label>
+          </div>
+          <div class="org-sub">Billing &amp; contract</div>
+          <div class="org-grid">
+            <label class="f2">Billing address (if different)<input name="billing_address"></label>
+            <label>Billing email<input name="billing_email" type="email"></label>
+            <label>Payment method
+              <select name="preferred_payment_method">
+                <option value="">Select…</option>
+                <option>Bank Transfer</option><option>PayFast</option><option>Monthly Invoice</option><option>Direct Debit</option>
+              </select>
+            </label>
+            <label>Service level
+              <select name="service_level">
+                <option value="">Select…</option>
+                <option>Standard</option><option>Priority</option><option>Premium</option><option>Premium + 24/7</option>
+              </select>
+            </label>
+            <label>Contract type
+              <select name="contract_type">
+                <option value="">Select…</option>
+                <option>Once-off Service</option><option>Maintenance Plan</option><option>Mixed</option>
+              </select>
+            </label>
+            <label>Contract start date<input name="contract_start_date" type="date"></label>
+            <label>Monthly contract value (R)<input name="monthly_contract_value" type="number" min="0" step="0.01" value="0"></label>
+          </div>
+          <div class="org-sub">Communication preferences</div>
+          <div class="org-grid">
+            <label>Preferred contact method
+              <select name="preferred_contact_method">
+                <option value="">Select…</option>
+                <option>Email</option><option>Phone</option><option>WhatsApp</option><option>SMS</option>
+              </select>
+            </label>
+            <label>Language
+              <select name="language_preference">
+                <option value="">Select…</option>
+                <option>English</option><option>Xhosa</option><option>Afrikaans</option><option>Other</option>
+              </select>
+            </label>
+          </div>
+          <div class="org-fieldset f2">
+            <span class="org-legend">Booking notifications via</span>
+            <div class="org-checks">
+              <label><input type="checkbox" name="booking_notification_method" value="Email"> Email</label>
+              <label><input type="checkbox" name="booking_notification_method" value="SMS"> SMS</label>
+              <label><input type="checkbox" name="booking_notification_method" value="WhatsApp"> WhatsApp</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phase 4 -->
+        <div class="org-phase" data-phase="4">
+          <div id="orgSummary" class="org-summary"></div>
+          <div class="org-sub">Consent &amp; legal</div>
+          <label class="org-inline"><input type="checkbox" name="popia_consent" required> <span>I consent to ASC Pest Control processing this information per the Privacy Policy. <strong>(required)</strong></span></label>
+          <label class="org-inline"><input type="checkbox" name="terms_acceptance" required> <span>I agree to the Terms of Service. <strong>(required)</strong></span></label>
+          <label class="org-inline"><input type="checkbox" name="marketing_consent"> <span>Send updates about new services and offers. (optional)</span></label>
+          <label class="org-inline"><input type="checkbox" name="emergency_response_consent"> <span>You may contact me outside normal hours for urgent pest incidents. (optional)</span></label>
+          <label class="org-inline"><input type="checkbox" name="photo_permission"> <span>ASC may photograph/video the site for audit documentation and training (anonymised). (optional)</span></label>
+          <div class="org-warn">The primary contact (<span id="orgWarnEmail">—</span>) will receive an onboarding confirmation email.</div>
+        </div>
+
+        <div class="alert err" id="orgError" style="display:none"></div>
+      </div>
+
+      <div class="bk-modal-foot">
+        <button type="button" class="btn btn-ghost btn-sm" id="orgBack" style="visibility:hidden">← Back</button>
+        <div class="bk-modal-actions">
+          <button type="button" class="btn btn-primary btn-sm" id="orgNext">Next →</button>
+          <button type="submit" class="btn btn-primary btn-sm" id="orgSubmit" style="display:none">Onboard organisation</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  .org-steps { display: flex; gap: .25rem; padding: .85rem 1.25rem; border-bottom: 1px solid var(--line, #e4e8ec); flex-wrap: wrap; }
+  .org-step { display: flex; align-items: center; gap: .4rem; font-size: .72rem; font-weight: 600; color: var(--muted, #6b7785); padding: .25rem .5rem; border-radius: 6px; }
+  .org-step span { width: 20px; height: 20px; border-radius: 50%; background: var(--line, #e4e8ec); color: var(--muted, #6b7785); font-size: .7rem; display: grid; place-items: center; }
+  .org-step.on { color: var(--accent, #B02040); }
+  .org-step.on span { background: var(--accent, #B02040); color: #fff; }
+  .org-step.done span { background: var(--green, #36c172); color: #fff; }
+  .org-phase { display: none; }
+  .org-phase.on { display: block; }
+  .org-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; }
+  .org-grid .f2, .bk-modal-body > .f2 { grid-column: 1 / -1; }
+  .org-grid label, .org-phase > label { display: flex; flex-direction: column; gap: .25rem; font-size: .72rem; font-weight: 600; color: var(--muted, #6b7785); }
+  .org-grid input, .org-grid select, .org-grid textarea, .org-phase > label input, .org-phase > label textarea {
+    font: inherit; font-size: .85rem; padding: .5rem .6rem; border: 1px solid var(--line, #e4e8ec); border-radius: 8px;
+    background: var(--bg-input, #fff); color: var(--text, #1f2a36); font-weight: 400; }
+  .org-sub { font-size: .7rem; text-transform: uppercase; letter-spacing: .06em; font-weight: 700; color: var(--muted, #6b7785); margin: 1rem 0 .55rem; }
+  .org-fieldset { border: 1px solid var(--line, #e4e8ec); border-radius: 8px; padding: .6rem .7rem; margin-top: .5rem; }
+  .org-legend { font-size: .7rem; font-weight: 700; color: var(--muted, #6b7785); }
+  .org-checks { display: flex; flex-wrap: wrap; gap: .5rem .9rem; margin-top: .4rem; }
+  .org-checks label { display: flex; align-items: center; gap: .35rem; font-size: .8rem; font-weight: 500; color: var(--text, #1f2a36); }
+  .org-inline { display: flex; align-items: flex-start; gap: .5rem; font-size: .82rem; color: var(--text, #1f2a36); margin: .5rem 0; line-height: 1.4; }
+  .org-inline input { margin-top: .15rem; }
+  .org-summary { background: var(--orange-soft, #f7e3e8); border: 1px solid #f7c6bf; border-radius: 10px; padding: .8rem 1rem; font-size: .82rem; line-height: 1.5; }
+  .org-warn { margin-top: .8rem; font-size: .78rem; color: var(--muted, #6b7785); background: #fff7da; border: 1px solid #ffe08a; border-radius: 8px; padding: .6rem .8rem; }
+
+  .bk-modal-overlay { position: fixed; inset: 0; z-index: 200; display: none; align-items: center; justify-content: center;
+    background: rgba(8,14,20,.62); padding: 1rem; }
+  .bk-modal-overlay.open { display: flex; }
+  .bk-modal { width: 560px; max-width: 100%; max-height: 90vh; overflow: auto; background: var(--card, #fff);
+    color: var(--text, #1f2a36); border-radius: 14px; box-shadow: 0 24px 70px rgba(0,0,0,.4); }
+  .bk-modal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
+    padding: 1.1rem 1.25rem; border-bottom: 1px solid var(--line, #e4e8ec); }
+  .bk-modal-kicker { font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted, #6b7785); font-weight: 700; }
+  .bk-modal-head h3 { margin: .2rem 0 0; font-size: 1.05rem; }
+  .bk-modal-close { background: none; border: none; font-size: 1.6rem; line-height: 1; cursor: pointer; color: var(--muted, #6b7785); }
+  .bk-modal-body { padding: 1rem 1.25rem; }
+  .bk-dl { display: grid; grid-template-columns: 38% 62%; gap: 0; }
+  .bk-dl dt { font-size: .76rem; font-weight: 600; color: var(--muted, #6b7785); padding: .55rem .75rem .55rem 0;
+    border-bottom: 1px solid var(--line, #e4e8ec); }
+  .bk-dl dd { font-size: .85rem; margin: 0; padding: .55rem 0; border-bottom: 1px solid var(--line, #e4e8ec); word-break: break-word; }
+  .bk-modal-foot { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .75rem;
+    padding: 1rem 1.25rem; border-top: 1px solid var(--line, #e4e8ec); }
+  .bk-modal-actions { display: flex; gap: .5rem; flex-wrap: wrap; }
+  .clickable-row { cursor: pointer; }
+  .clickable-row:hover { background: var(--row-hover, rgba(0,0,0,.035)); }
+  .stat-link { cursor: pointer; }
+  .stat-link:hover { outline: 2px solid var(--accent, #B02040); outline-offset: 2px; }
+</style>
+
+<script>
+(function () {
+  /* ── Config ── */
+  var API = (location.protocol === 'file:' || location.port === '8080')
+    ? 'http://127.0.0.1:8000'
+    : location.origin;
+
+  var ALLOWED_ROLES = ['admin', 'branch_manager'];
+
+  /* ── Auth check ── */
+  var token = localStorage.getItem('asc_token') || sessionStorage.getItem('asc_token');
+  var role  = localStorage.getItem('asc_role')  || sessionStorage.getItem('asc_role');
+
+  function redirectToSignin() {
+    sessionStorage.setItem('asc_redirect', location.href);
+    location.href = 'signin.html';
+  }
+
+  if (!token || !role) { redirectToSignin(); return; }
+
+  /* Basic JWT expiry check (no signature verification — server validates) */
+  try {
+    var parts = token.split('.');
+    if (parts.length !== 3) throw new Error('bad token');
+    var payload = JSON.parse(atob(parts[1].replace(/-/g,'+').replace(/_/g,'/')));
+    if (payload.exp && Date.now() / 1000 > payload.exp) {
+      localStorage.removeItem('asc_token'); localStorage.removeItem('asc_role');
+      redirectToSignin(); return;
+    }
+  } catch (e) { redirectToSignin(); return; }
+
+  if (!ALLOWED_ROLES.includes(role)) {
+    document.getElementById('access-gate').innerHTML =
+      '<svg viewBox="0 0 24 24" width="42" height="42" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="color:#f87171"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>' +
+      '<h2 style="color:#f87171">Access denied</h2>' +
+      '<p>This dashboard requires admin or branch manager access. You are signed in as <strong>' + role + '</strong>.</p>' +
+      '<a href="signin.html" class="btn btn-ghost" style="margin-top:.5rem">Sign in with another account</a>';
+    return;
+  }
+
+  /* ── Hide gate ── */
+  document.getElementById('access-gate').style.display = 'none';
+
+  /* ── Populate identity ── */
+  var initials = (payload.sub || 'AS').substring(0, 2).toUpperCase();
+  document.getElementById('sideAv').textContent  = initials;
+  document.getElementById('topAv').textContent   = initials;
+  document.getElementById('sideName').textContent = payload.sub || 'Admin';
+  document.getElementById('sideRole').textContent = role.replace('_', ' ') + ' · Gqeberha';
+  document.getElementById('topName').textContent  = role.replace('_', ' ');
+
+  /* ── Date header ── */
+  var now = new Date();
+  var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('pageDate').textContent =
+    days[now.getDay()] + ', ' + now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear() + ' · Gqeberha branch';
+
+  /* ── Sign out ── */
+  document.getElementById('signOutBtn').addEventListener('click', function () {
+    ['asc_token','asc_role','asc_user_id','asc_branch_id'].forEach(function (k) {
+      localStorage.removeItem(k); sessionStorage.removeItem(k);
+    });
+    location.href = 'signin.html';
+  });
+
+  /* ── Sidebar navigation ── */
+  var navLinks = document.querySelectorAll('.nav-link[data-page], .nav-shortcut[data-page]');
+  var pageTitles = {
+    dashboard: 'Operations Dashboard', leads: 'Leads / CRM',
+    scheduling: 'Scheduling', customers: 'Customers', organisations: 'Organisations',
+    invoices: 'Invoices', technicians: 'Technicians', reports: 'Service Reports'
+  };
+
+  function switchPage(id) {
+    document.querySelectorAll('.page-content').forEach(function (p) { p.classList.remove('active'); });
+    document.querySelectorAll('.nav-link').forEach(function (l) { l.classList.remove('active'); });
+    var page = document.getElementById('page-' + id);
+    if (page) page.classList.add('active');
+    var link = document.querySelector('.nav-link[data-page="' + id + '"]');
+    if (link) link.classList.add('active');
+    document.getElementById('pageTitle').textContent = pageTitles[id] || id;
+    /* close sidebar on mobile */
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sideOverlay').classList.remove('open');
+  }
+
+  navLinks.forEach(function (el) {
+    el.addEventListener('click', function (e) {
+      e.preventDefault();
+      switchPage(el.getAttribute('data-page'));
+    });
+  });
+
+  /* ── "Bookings today" stat card → leads page, scroll to bookings table ── */
+  function gotoBookings() {
+    switchPage('leads');
+    var anchor = document.getElementById('bookingsAnchor');
+    if (anchor) setTimeout(function () { anchor.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60);
+  }
+  var bookingsStat = document.getElementById('bookingsStat');
+  if (bookingsStat) {
+    bookingsStat.addEventListener('click', gotoBookings);
+    bookingsStat.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); gotoBookings(); } });
+  }
+
+  /* ── Mobile sidebar toggle ── */
+  document.getElementById('mobToggle').addEventListener('click', function () {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sideOverlay').classList.toggle('open');
+  });
+  document.getElementById('sideOverlay').addEventListener('click', function () {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sideOverlay').classList.remove('open');
+  });
+
+  /* ── API health check ── */
+  function checkApi() {
+    fetch(API + '/healthz').then(function (r) {
+      var online = r.ok;
+      document.getElementById('apiDot').className   = 'api-dot' + (online ? '' : ' offline');
+      document.getElementById('apiLabel').textContent = online ? 'API online' : 'API offline';
+    }).catch(function () {
+      document.getElementById('apiDot').className   = 'api-dot offline';
+      document.getElementById('apiLabel').textContent = 'API offline';
+    });
+  }
+  checkApi();
+
+  /* ── Fetch analytics from API ── */
+  function loadAnalytics() {
+    fetch(API + '/v1/analytics/summary', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    }).then(function (r) {
+      if (r.status === 401) { redirectToSignin(); return; }
+      return r.json();
+    }).then(function (d) {
+      if (!d) return;
+      document.getElementById('s-leads').textContent   = d.total_leads;
+      document.getElementById('s-leads-d').textContent = '▲ ' + d.new_leads + ' new leads';
+
+      /* Recent leads table */
+      var leadsBody = document.getElementById('leadsTable');
+      var leadsTotal = document.getElementById('leadsTotal');
+      if (leadsTotal) leadsTotal.textContent = d.total_leads + ' total';
+      if (d.recent_leads && d.recent_leads.length) {
+        leadsBody.innerHTML = d.recent_leads.map(function (l) {
+          var statusClass = { new: 'b-blue', contacted: 'b-amber', quoted: 'b-purple', won: 'b-green', lost: 'b-grey' }[l.status] || 'b-grey';
+          var date = l.created_at ? new Date(l.created_at).toLocaleDateString('en-ZA', {day:'2-digit',month:'short'}) : '–';
+          var svcs = Array.isArray(l.service_interest) ? l.service_interest.join(', ') : (l.service_interest || '–');
+          return '<tr>' +
+            '<td class="t-strong t-mono">' + (l.reference || '–') + '</td>' +
+            '<td>' + (l.source || '–') + '</td>' +
+            '<td class="t-sub">' + svcs + '</td>' +
+            '<td><span class="badge ' + statusClass + '">' + l.status + '</span></td>' +
+            '<td class="t-sub">' + date + '</td>' +
+          '</tr>';
+        }).join('');
+      } else {
+        leadsBody.innerHTML = '<tr><td colspan="5" class="empty">No leads yet.</td></tr>';
+      }
+    }).catch(function () {
+      /* API unavailable — leave mock data in place */
+    });
+  }
+  loadAnalytics();
+
+  /* ── Website form submissions (live from DB) ── */
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' })[c]; }); }
+  function fmtDate(iso) { return iso ? new Date(iso).toLocaleDateString('en-ZA', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }) : '–'; }
+  var STATUS_BADGE = { pending:'b-amber', confirmed:'b-blue', completed:'b-green', cancelled:'b-grey', new:'b-blue', contacted:'b-amber', resolved:'b-green' };
+
+  var bookingsById = {};
+
+  function bookingRow(b) {
+    var cls = STATUS_BADGE[b.status] || 'b-grey';
+    var dt = (esc(b.book_date) || '–') + (b.book_time ? ' · ' + esc(b.book_time) : '');
+    return '<tr class="clickable-row" data-bk="' + esc(b.id) + '">' +
+      '<td class="t-strong t-mono">' + esc(b.reference) + '</td>' +
+      '<td><div class="t-strong">' + esc(b.name) + '</div><div class="t-sub">' + esc(b.email) + (b.phone ? ' · ' + esc(b.phone) : '') + '</div></td>' +
+      '<td class="t-sub">' + esc(b.service) + '</td>' +
+      '<td class="t-sub">' + dt + '</td>' +
+      '<td class="t-sub">' + esc(b.region) + '</td>' +
+      '<td><span class="badge ' + cls + '">' + esc(b.status) + '</span></td>' +
+      '<td class="t-sub">' + fmtDate(b.created_at) + '</td>' +
+    '</tr>';
+  }
+
+  function loadBookings() {
+    fetch(API + '/v1/bookings', { headers: { 'Authorization': 'Bearer ' + token } })
+      .then(function (r) { if (r.status === 401) { redirectToSignin(); return; } return r.json(); })
+      .then(function (rows) {
+        if (!rows) return;
+        bookingsById = {};
+        rows.forEach(function (b) { bookingsById[b.id] = b; });
+
+        // Split by booking type. contact_about/type is "commercial" or "residential".
+        var comm = rows.filter(function (b) { return String(b.type || '').toLowerCase().indexOf('resid') === -1; });
+        var res  = rows.filter(function (b) { return String(b.type || '').toLowerCase().indexOf('resid') !== -1; });
+
+        var commBody = document.getElementById('bookingsCommTable');
+        var resBody  = document.getElementById('bookingsResTable');
+        document.getElementById('commTotal').textContent = comm.length + ' total';
+        document.getElementById('resTotal').textContent  = res.length + ' total';
+        commBody.innerHTML = comm.length ? comm.map(bookingRow).join('') : '<tr><td colspan="7" class="empty">No commercial bookings yet.</td></tr>';
+        resBody.innerHTML  = res.length  ? res.map(bookingRow).join('')  : '<tr><td colspan="7" class="empty">No residential bookings yet.</td></tr>';
+
+        // Wire row clicks → detail modal.
+        document.querySelectorAll('tr.clickable-row[data-bk]').forEach(function (tr) {
+          tr.addEventListener('click', function () { openBooking(tr.getAttribute('data-bk')); });
+        });
+
+        // Bookings today stat.
+        var today = new Date().toISOString().slice(0, 10);
+        var todays = rows.filter(function (b) { return (b.created_at || '').slice(0, 10) === today; }).length;
+        var sb = document.getElementById('s-bookings'); if (sb) sb.textContent = todays;
+      }).catch(function () { /* API unavailable */ });
+  }
+
+  /* ── Booking detail modal + status changes ── */
+  var STATUS_FLOW = { pending: 'confirmed', confirmed: 'completed' };
+  var modal = document.getElementById('bkModal');
+
+  function closeBooking() { modal.classList.remove('open'); modal.setAttribute('aria-hidden', 'true'); }
+  document.getElementById('bkModalClose').addEventListener('click', closeBooking);
+  modal.addEventListener('click', function (e) { if (e.target === modal) closeBooking(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeBooking(); });
+
+  function row(label, value) {
+    if (value == null || value === '') return '';
+    return '<dt>' + esc(label) + '</dt><dd>' + esc(value) + '</dd>';
+  }
+
+  function openBooking(id) {
+    var b = bookingsById[id];
+    if (!b) return;
+    var isRes = String(b.type || '').toLowerCase().indexOf('resid') !== -1;
+    document.getElementById('bkModalKicker').textContent = isRes ? 'Residential booking' : 'Commercial & industrial booking';
+    document.getElementById('bkModalTitle').textContent = b.reference + ' — ' + b.name;
+    document.getElementById('bkModalBody').innerHTML = '<dl class="bk-dl">' +
+      row('Reference', b.reference) +
+      row('Booking type', b.type) +
+      row('Customer', b.name) +
+      row('Email', b.email) +
+      row('Phone', b.phone) +
+      row('Region', b.region) +
+      row('Service(s)', b.service) +
+      row('Preferred date', b.book_date) +
+      row('Preferred time', b.book_time) +
+      row('Address / location', b.location) +
+      row('Existing customer', b.existing_customer ? 'Yes' : 'No') +
+      row('Additional details', b.additional_info) +
+      row('Received', fmtDate(b.created_at)) +
+    '</dl>';
+
+    var statusEl = document.getElementById('bkModalStatus');
+    statusEl.className = 'badge ' + (STATUS_BADGE[b.status] || 'b-grey');
+    statusEl.textContent = b.status;
+
+    var actions = document.getElementById('bkModalActions');
+    actions.innerHTML = '';
+    var next = STATUS_FLOW[b.status];
+    if (next) {
+      var btn = document.createElement('button');
+      btn.className = 'btn btn-primary btn-sm';
+      btn.textContent = 'Mark ' + next;
+      btn.addEventListener('click', function () { changeStatus(b.id, next); });
+      actions.appendChild(btn);
+    }
+    if (b.status !== 'cancelled' && b.status !== 'completed') {
+      var cancel = document.createElement('button');
+      cancel.className = 'btn btn-ghost btn-sm';
+      cancel.textContent = 'Cancel booking';
+      cancel.addEventListener('click', function () { changeStatus(b.id, 'cancelled'); });
+      actions.appendChild(cancel);
+    }
+
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+  }
+
+  function changeStatus(id, status) {
+    fetch(API + '/v1/bookings/' + encodeURIComponent(id) + '/status', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ status: status })
+    }).then(function (r) {
+      if (r.status === 401) { redirectToSignin(); return; }
+      if (!r.ok) { alert('Could not update status.'); return; }
+      return r.json();
+    }).then(function (d) {
+      if (!d) return;
+      if (bookingsById[id]) bookingsById[id].status = d.status;
+      loadBookings();
+      openBooking(id);
+    }).catch(function () { alert('Network error updating status.'); });
+  }
+
+  function loadEnquiries() {
+    fetch(API + '/v1/enquiries', { headers: { 'Authorization': 'Bearer ' + token } })
+      .then(function (r) { if (r.status === 401) { redirectToSignin(); return; } return r.json(); })
+      .then(function (rows) {
+        if (!rows) return;
+        var body = document.getElementById('enquiriesTable');
+        var total = document.getElementById('enquiriesTotal');
+        if (total) total.textContent = rows.length + ' total';
+        if (!rows.length) { body.innerHTML = '<tr><td colspan="7" class="empty">No enquiries yet.</td></tr>'; return; }
+        body.innerHTML = rows.map(function (e) {
+          var cls = STATUS_BADGE[e.status] || 'b-grey';
+          return '<tr>' +
+            '<td><div class="t-strong">' + esc(e.name) + '</div><div class="t-sub">' + esc(e.email) + (e.phone ? ' · ' + esc(e.phone) : '') + '</div></td>' +
+            '<td class="t-sub">' + esc(e.contact_about) + '</td>' +
+            '<td class="t-sub">' + esc(e.enquiry_type) + '</td>' +
+            '<td class="t-sub">' + (esc(e.service) || '–') + '</td>' +
+            '<td class="t-sub">' + esc(e.region) + '</td>' +
+            '<td><span class="badge ' + cls + '">' + esc(e.status) + '</span></td>' +
+            '<td class="t-sub">' + fmtDate(e.created_at) + '</td>' +
+          '</tr>';
+        }).join('');
+      }).catch(function () { /* API unavailable */ });
+  }
+  loadBookings();
+  loadEnquiries();
+
+  /* ── Organisations: KPIs + table ── */
+  var ORG_STATUS_BADGE = { active: 'b-green', onboarding: 'b-amber', awaiting_docs: 'b-blue', suspended: 'b-grey' };
+  function money(n) { return 'R ' + Number(n || 0).toLocaleString('en-ZA', { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
+  function statusLabel(s) { return String(s || '').replace('_', ' '); }
+
+  function loadOrganisations() {
+    fetch(API + '/v1/organisations/summary', { headers: { 'Authorization': 'Bearer ' + token } })
+      .then(function (r) { if (r.status === 401) { redirectToSignin(); return; } return r.json(); })
+      .then(function (d) {
+        if (!d) return;
+        document.getElementById('org-total').textContent   = d.total_organisations;
+        document.getElementById('org-active').textContent  = d.active_contracts;
+        document.getElementById('org-pending').textContent = d.pending_onboarding;
+        document.getElementById('org-value').textContent   = money(d.monthly_contract_value);
+      }).catch(function () {});
+
+    fetch(API + '/v1/organisations', { headers: { 'Authorization': 'Bearer ' + token } })
+      .then(function (r) { if (r.status === 401) { redirectToSignin(); return; } return r.json(); })
+      .then(function (rows) {
+        if (!rows) return;
+        var body = document.getElementById('orgTable');
+        document.getElementById('orgTotalLbl').textContent = rows.length + ' total';
+        if (!rows.length) { body.innerHTML = '<tr><td colspan="6" class="empty">No organisations yet. Click “Onboard new organisation”.</td></tr>'; return; }
+        body.innerHTML = rows.map(function (o) {
+          var cls = ORG_STATUS_BADGE[o.status] || 'b-grey';
+          return '<tr>' +
+            '<td><div class="t-strong">' + esc(o.company_name) + '</div><div class="t-sub">' + esc(o.contact_person_name) + ' · ' + esc(o.contact_email) + '</div></td>' +
+            '<td class="t-sub">' + esc(o.industry) + '</td>' +
+            '<td class="t-sub">' + esc(o.number_of_sites) + '</td>' +
+            '<td class="t-sub">' + (esc(o.service_level) || '–') + '</td>' +
+            '<td><span class="badge ' + cls + '">' + esc(statusLabel(o.status)) + '</span></td>' +
+            '<td class="t-sub">' + money(o.monthly_contract_value) + '</td>' +
+          '</tr>';
+        }).join('');
+      }).catch(function () {});
+  }
+  loadOrganisations();
+
+  /* ── Onboarding modal: step navigation + submit ── */
+  var orgModal = document.getElementById('orgModal');
+  var orgForm = document.getElementById('orgForm');
+  var orgStep = 1;
+  var ORG_MAX = 4;
+
+  function orgShow(step) {
+    orgStep = step;
+    orgForm.querySelectorAll('.org-phase').forEach(function (p) { p.classList.toggle('on', +p.dataset.phase === step); });
+    document.querySelectorAll('#orgSteps .org-step').forEach(function (s) {
+      var n = +s.dataset.step;
+      s.classList.toggle('on', n === step);
+      s.classList.toggle('done', n < step);
+    });
+    document.getElementById('orgBack').style.visibility = step === 1 ? 'hidden' : 'visible';
+    document.getElementById('orgNext').style.display = step === ORG_MAX ? 'none' : '';
+    document.getElementById('orgSubmit').style.display = step === ORG_MAX ? '' : 'none';
+    if (step === ORG_MAX) buildOrgSummary();
+  }
+
+  function orgVal(name) { var el = orgForm.elements[name]; return el ? el.value.trim() : ''; }
+  function orgChecks(name) {
+    return Array.prototype.slice.call(orgForm.querySelectorAll('input[name="' + name + '"]:checked')).map(function (c) { return c.value; });
+  }
+
+  function validatePhase(step) {
+    document.getElementById('orgError').style.display = 'none';
+    var required = { 1: ['company_name', 'industry', 'contact_person_name', 'contact_email', 'contact_phone'] }[step] || [];
+    for (var i = 0; i < required.length; i++) {
+      if (!orgVal(required[i])) { showOrgErr('Please complete all required fields in this step.'); return false; }
+    }
+    return true;
+  }
+  function showOrgErr(msg) { var e = document.getElementById('orgError'); e.textContent = msg; e.style.display = 'block'; }
+
+  function buildOrgSummary() {
+    document.getElementById('orgWarnEmail').textContent = orgVal('contact_email') || '—';
+    var rows = [
+      ['Company', orgVal('company_name')],
+      ['Industry', orgVal('industry')],
+      ['Primary contact', orgVal('contact_person_name') + ' · ' + orgVal('contact_email')],
+      ['Sites', orgVal('number_of_sites') || '1'],
+      ['Service level', orgVal('service_level') || '—'],
+      ['Contract', (orgVal('contract_type') || '—') + ' · ' + money(orgVal('monthly_contract_value')) + '/mo'],
+      ['Pest concerns', orgChecks('pest_concerns').join(', ') || '—'],
+      ['Audit-ready', orgForm.elements['requires_audit_ready'].checked ? 'Yes' : 'No']
+    ];
+    document.getElementById('orgSummary').innerHTML =
+      '<strong>Review — this will create:</strong><br>' +
+      rows.map(function (r) { return '• <strong>' + esc(r[0]) + ':</strong> ' + esc(r[1]); }).join('<br>');
+  }
+
+  /* Persist the in-progress form so closing the modal (or a reload) never loses typing. */
+  var ORG_DRAFT_KEY = 'asc_org_draft';
+  function saveOrgDraft() {
+    var data = { step: orgStep, fields: {}, checks: {} };
+    Array.prototype.slice.call(orgForm.elements).forEach(function (el) {
+      if (!el.name) return;
+      if (el.type === 'checkbox') { (data.checks[el.name] = data.checks[el.name] || []); if (el.checked) data.checks[el.name].push(el.value); }
+      else if (el.type !== 'submit' && el.type !== 'button') { data.fields[el.name] = el.value; }
+    });
+    try { localStorage.setItem(ORG_DRAFT_KEY, JSON.stringify(data)); } catch (e) {}
+  }
+  function restoreOrgDraft() {
+    var raw; try { raw = localStorage.getItem(ORG_DRAFT_KEY); } catch (e) { return 1; }
+    if (!raw) return 1;
+    var data; try { data = JSON.parse(raw); } catch (e) { return 1; }
+    Object.keys(data.fields || {}).forEach(function (n) { if (orgForm.elements[n] && orgForm.elements[n].type !== 'checkbox') orgForm.elements[n].value = data.fields[n]; });
+    Object.keys(data.checks || {}).forEach(function (n) {
+      var set = data.checks[n];
+      orgForm.querySelectorAll('input[type="checkbox"][name="' + n + '"]').forEach(function (cb) { cb.checked = set.indexOf(cb.value) !== -1; });
+    });
+    return data.step || 1;
+  }
+  function clearOrgDraft() { try { localStorage.removeItem(ORG_DRAFT_KEY); } catch (e) {} }
+
+  orgForm.addEventListener('input', saveOrgDraft);
+  orgForm.addEventListener('change', saveOrgDraft);
+
+  function openOrgModal() {
+    var step = restoreOrgDraft();         // keep whatever was typed before
+    orgShow(step);
+    document.getElementById('orgError').style.display = 'none';
+    orgModal.classList.add('open'); orgModal.setAttribute('aria-hidden', 'false');
+  }
+  /* Closing (outside-click, ✕ or Esc) preserves the draft — it does NOT reset. */
+  function closeOrgModal() { saveOrgDraft(); orgModal.classList.remove('open'); orgModal.setAttribute('aria-hidden', 'true'); }
+  function resetOrgForm() { clearOrgDraft(); orgForm.reset(); orgShow(1); }
+
+  document.getElementById('onboardBtn').addEventListener('click', openOrgModal);
+  document.getElementById('orgModalClose').addEventListener('click', closeOrgModal);
+  orgModal.addEventListener('click', function (e) { if (e.target === orgModal) closeOrgModal(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && orgModal.classList.contains('open')) closeOrgModal(); });
+  document.getElementById('orgBack').addEventListener('click', function () { if (orgStep > 1) orgShow(orgStep - 1); });
+  document.getElementById('orgNext').addEventListener('click', function () { if (validatePhase(orgStep)) orgShow(Math.min(ORG_MAX, orgStep + 1)); });
+
+  orgForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!orgForm.elements['popia_consent'].checked || !orgForm.elements['terms_acceptance'].checked) {
+      showOrgErr('POPIA consent and Terms of Service acceptance are required.'); return;
+    }
+    var emails = orgVal('additional_user_emails');
+    var role = orgVal('user_role');
+    var additional_users = emails ? emails.split(',').map(function (em) { return { email: em.trim(), role: role }; }).filter(function (u) { return u.email; }) : [];
+
+    var payload = {
+      company_name: orgVal('company_name'),
+      registration_number: orgVal('registration_number') || null,
+      vat_id: orgVal('vat_id') || null,
+      industry: orgVal('industry'),
+      company_size: orgVal('company_size') || null,
+      contact_person_name: orgVal('contact_person_name'),
+      contact_email: orgVal('contact_email'),
+      contact_phone: orgVal('contact_phone'),
+      role_at_company: orgVal('role_at_company') || null,
+      number_of_sites: parseInt(orgVal('number_of_sites') || '1', 10),
+      pest_concerns: orgChecks('pest_concerns'),
+      primary_problem: orgVal('primary_problem') || null,
+      service_frequency: orgVal('service_frequency') || null,
+      requires_audit_ready: orgForm.elements['requires_audit_ready'].checked,
+      food_certifications: orgChecks('food_certifications'),
+      audit_frequency: orgVal('audit_frequency') || null,
+      compliance_officer_email: orgVal('compliance_officer_email') || null,
+      additional_users: additional_users,
+      billing_address: orgVal('billing_address') || null,
+      billing_email: orgVal('billing_email') || null,
+      preferred_payment_method: orgVal('preferred_payment_method') || null,
+      service_level: orgVal('service_level') || null,
+      contract_type: orgVal('contract_type') || null,
+      contract_start_date: orgVal('contract_start_date') || null,
+      monthly_contract_value: parseFloat(orgVal('monthly_contract_value') || '0'),
+      preferred_contact_method: orgVal('preferred_contact_method') || null,
+      booking_notification_method: orgChecks('booking_notification_method'),
+      language_preference: orgVal('language_preference') || null,
+      popia_consent: orgForm.elements['popia_consent'].checked,
+      terms_acceptance: orgForm.elements['terms_acceptance'].checked,
+      marketing_consent: orgForm.elements['marketing_consent'].checked,
+      emergency_response_consent: orgForm.elements['emergency_response_consent'].checked,
+      photo_permission: orgForm.elements['photo_permission'].checked
+    };
+    var site = {};
+    if (orgVal('site_name') && orgVal('site_address')) {
+      site = {
+        site_name: orgVal('site_name'), site_address: orgVal('site_address'),
+        site_type: orgVal('site_type') || null, access_notes: orgVal('access_notes') || null,
+        site_contact_name: orgVal('site_contact_name') || null, site_contact_phone: orgVal('site_contact_phone') || null,
+        square_meters: orgVal('square_meters') ? parseInt(orgVal('square_meters'), 10) : null
+      };
+      payload.site = site;
+    }
+
+    var btn = document.getElementById('orgSubmit');
+    btn.textContent = 'Onboarding…'; btn.disabled = true;
+    fetch(API + '/v1/organisations', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify(payload)
+    }).then(function (r) {
+      if (r.status === 401) { redirectToSignin(); return; }
+      return r.json().then(function (d) { return { ok: r.ok, data: d }; });
+    }).then(function (res) {
+      btn.textContent = 'Onboard organisation'; btn.disabled = false;
+      if (!res) return;
+      if (!res.ok) { showOrgErr((res.data && res.data.detail) || 'Could not onboard organisation.'); return; }
+      resetOrgForm();                        // success → safe to clear the saved draft
+      orgModal.classList.remove('open'); orgModal.setAttribute('aria-hidden', 'true');
+      loadOrganisations();
+      if (res.data && res.data.login_provisioned) {
+        alert('Organisation onboarded. Portal login credentials have been emailed to ' + payload.contact_email + '.');
+      } else {
+        alert('Organisation onboarded. A confirmation has been emailed to ' + payload.contact_email + '.');
+      }
+    }).catch(function () {
+      btn.textContent = 'Onboard organisation'; btn.disabled = false;
+      showOrgErr('Network error. Is the API running?');
+    });
+  });
+
+  /* ── Refresh button ── */
+  document.getElementById('refreshBtn').addEventListener('click', function () {
+    checkApi(); loadAnalytics(); loadBookings(); loadEnquiries(); loadOrganisations();
+  });
+
+  /* ── Empty states for sections without a data source yet ── */
+  document.getElementById('kanbanBoard').innerHTML =
+    '<div class="empty" style="padding:1rem">No pipeline data yet.</div>';
+  document.getElementById('scheduleBody').innerHTML =
+    '<tr><td colspan="4" class="empty">No jobs scheduled yet.</td></tr>';
+  document.getElementById('techList').innerHTML =
+    '<div class="empty" style="padding:1rem">No technicians yet.</div>';
+  document.getElementById('invoicesBody').innerHTML =
+    '<tr><td colspan="5" class="empty">No invoices yet.</td></tr>';
+
+})();
+</script>
+</body>
+</html>
